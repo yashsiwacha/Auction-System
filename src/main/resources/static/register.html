@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Auction System</title>
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+    <div class="register-container">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email">
+            </div>
+            <div class="input-group">
+                <label for="role">Role</label>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="SELLER">Seller</option>
+                    <option value="BUYER">Buyer</option>
+                </select>
+            </div>
+            <button type="submit">Register</button>
+            <div id="registerMessage" class="message"></div>
+        </form>
+    </div>
+    <script src="register.js"></script>
+</body>
+</html>
