@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>Admin Dashboard - Auction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
+            <div class="navbar-nav ms-auto">
+                <!-- Real-time IST Clock -->
+                <div class="navbar-text me-4">
+                    <i class="fas fa-clock text-warning"></i>
+                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
+                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
+                </div>
+                
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link active" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="/admin/products"><i class="fas fa-box"></i> Manage Products</a>
+                <a class="nav-link" href="/admin/users"><i class="fas fa-users"></i> Manage Users</a>
+                <a class="nav-link" href="/admin/slots"><i class="fas fa-clock"></i> Auction Slots</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <div class="container mt-3" th:if="${success != null or error != null}">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+
+        <!-- Statistics Cards -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Total Users</h6>
+                                <h3 th:text="${#lists.size(allUsers)}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Total Products</h6>
+                                <h3 th:text="${#lists.size(allProducts)}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-box fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Pending Approvals</h6>
+                                <h3 th:text="${#lists.size(pendingProducts)}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Active Auctions</h6>
+                                <h3 th:text="${#lists.size(allProducts)}">0</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-gavel fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Approvals -->
+        <div class="row mt-4" th:if="${!#lists.isEmpty(pendingProducts)}">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-clock"></i> Pending Product Approvals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Seller</th>
+                                        <th>Starting Price</th>
+                                        <th>Auction Period</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="product : ${pendingProducts}">
+                                        <td>
+                                            <strong th:text="${product.title}"></strong><br></br>
+                                            <small class="text-muted" th:text="${product.description}"></small>
+                                        </td>
+                                        <td th:text="${product.seller.fullName}"></td>
+                                        <td th:text="'₹' + ${product.startingPrice}"></td>
+                                        <td>
+                                            <small>
+                                                <span th:text="${product.auctionStartTime}"></span>
+                                                to
+                                                <span th:text="${product.auctionEndTime}"></span>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <form style="display: inline;" method="post" th:action="@{'/admin/product/approve/' + ${product.id}}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form style="display: inline;" method="post" th:action="@{'/admin/product/reject/' + ${product.id}}">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/admin/products" class="btn btn-primary me-2">
+                            <i class="fas fa-box"></i> Manage Products
+                        </a>
+                        <a href="/admin/users" class="btn btn-secondary">
+                            <i class="fas fa-users"></i> Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> System Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>System:</strong> <span class="badge bg-success">Operational</span></p>
+                        <p><strong>Database:</strong> <span class="badge bg-success">Connected</span></p>
+                        <p><strong>Last Updated:</strong> <span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm')}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Real-time IST Clock Script -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            
+            // Convert to IST (UTC+5:30)
+            const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const istTime = new Date(utc + istOffset);
+            
+            // Format time as HH:MM:SS
+            const hours = String(istTime.getHours()).padStart(2, '0');
+            const minutes = String(istTime.getMinutes()).padStart(2, '0');
+            const seconds = String(istTime.getSeconds()).padStart(2, '0');
+            
+            // Format date
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                timeZone: 'Asia/Kolkata'
+            };
+            const dateStr = istTime.toLocaleDateString('en-IN', options);
+            
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            const clockElement = document.getElementById('liveClock');
+            
+            if (clockElement) {
+                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
+            }
+        }
+        
+        // Update clock immediately and then every second
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

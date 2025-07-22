@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Bids - Auction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/buyer/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
+            <div class="navbar-nav ms-auto">
+                <!-- Real-time IST Clock -->
+                <div class="navbar-text me-4">
+                    <i class="fas fa-clock text-warning"></i>
+                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
+                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
+                </div>
+                
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Buyer Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/buyer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="/buyer/auctions"><i class="fas fa-gavel"></i> Browse Auctions</a>
+                <a class="nav-link active" href="/buyer/my-bids"><i class="fas fa-hand-holding-usd"></i> My Bids</a>
+                <a class="nav-link" href="/buyer/search"><i class="fas fa-search"></i> Search</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <div class="container mt-3" th:if="${success != null or error != null}">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-hand-holding-usd"></i> My Bids</h2>
+                </div>
+
+                <!-- Filter Tabs -->
+                <ul class="nav nav-tabs mb-3" id="bidTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                            All Bids <span class="badge bg-secondary ms-1" th:text="${allBids.size()}"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="winning-tab" data-bs-toggle="tab" data-bs-target="#winning" type="button" role="tab">
+                            Winning <span class="badge bg-success ms-1" th:text="${winningBids.size()}"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="outbid-tab" data-bs-toggle="tab" data-bs-target="#outbid" type="button" role="tab">
+                            Outbid <span class="badge bg-warning ms-1" th:text="${outbidBids.size()}"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="won-tab" data-bs-toggle="tab" data-bs-target="#won" type="button" role="tab">
+                            Won <span class="badge bg-info ms-1" th:text="${wonBids.size()}"></span>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="bidTabsContent">
+                    <!-- All Bids Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel">
+                                                <div th:if="${allBids.size() == 0}" class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Bids Yet</h4>
+                            <p class="text-muted">You haven't placed any bids yet. Start bidding on auctions!</p>
+                            <a href="/buyer/auctions" class="btn btn-primary">Browse Auctions</a>
+                        </div>
+
+                        <div th:if="${allBids.size() > 0}" class="row">
+                            <div class="col-12" th:each="bid : ${allBids}">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-3">
+                                                <div th:if="${bid.product.imageUrl == null or bid.product.imageUrl == ''}" class="text-center">
+                                                    <div class="border rounded p-3" style="height: 100px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
+                                                <img th:if="${bid.product.imageUrl != null and bid.product.imageUrl != ''}" 
+                                                     th:src="${bid.product.imageUrl}" class="img-fluid rounded" 
+                                                     th:alt="${bid.product.title}" style="height: 100px; width: 100%; object-fit: cover;" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="card-title">
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="text-decoration-none" th:text="${bid.product.title}"></a>
+                                                </h5>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Your Bid:</strong> <span class="text-primary" th:text="'₹' + ${bid.bidAmount}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Current Highest:</strong> <span class="text-danger" th:text="'₹' + ${bid.product.currentHighestBid}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Bid Time:</strong> <span th:text="${bid.bidTime}"></span>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    <strong>Auction Ends:</strong> <span th:text="${bid.product.auctionEndTime}"></span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-3 text-end">
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success" th:if="${bid.status.name() == 'WINNING'}">Winning</span>
+                                                    <span class="badge bg-warning" th:if="${bid.status.name() == 'OUTBID'}">Outbid</span>
+                                                    <span class="badge bg-info" th:if="${bid.status.name() == 'WON'}">Won</span>
+                                                    <span class="badge bg-secondary" th:if="${bid.status.name() == 'ACTIVE'}">Active</span>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success" th:if="${bid.product.status.name() == 'ACTIVE'}">Active Auction</span>
+                                                    <span class="badge bg-info" th:if="${bid.product.status.name() == 'COMPLETED'}">Ended</span>
+                                                </div>
+                                                <div>
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i> View Auction
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Winning Bids Tab -->
+                    <div class="tab-pane fade" id="winning" role="tabpanel">
+                        <div th:if="${winningBids.size() == 0}" class="text-center py-5">
+                            <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Winning Bids</h4>
+                            <p class="text-muted">You don't have any winning bids at the moment.</p>
+                        </div>
+
+                        <div th:if="${winningBids.size() > 0}" class="row">
+                            <div class="col-12" th:each="bid : ${winningBids}">
+                                <div class="card mb-3 border-success">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-trophy"></i> You're currently winning this auction!
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-3">
+                                                <div th:if="${bid.product.imageUrl == null or bid.product.imageUrl == ''}" class="text-center">
+                                                    <div class="border rounded p-3" style="height: 100px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
+                                                <img th:if="${bid.product.imageUrl != null and bid.product.imageUrl != ''}" 
+                                                     th:src="${bid.product.imageUrl}" class="img-fluid rounded" 
+                                                     th:alt="${bid.product.title}" style="height: 100px; width: 100%; object-fit: cover;" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="card-title">
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="text-decoration-none" th:text="${bid.product.title}"></a>
+                                                </h5>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Your Winning Bid:</strong> <span class="text-success fw-bold" th:text="'₹' + ${bid.bidAmount}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Auction Ends:</strong> <span th:text="${bid.product.auctionEndTime}"></span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-3 text-end">
+                                                <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-eye"></i> View Auction
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Outbid Tab -->
+                    <div class="tab-pane fade" id="outbid" role="tabpanel">
+                        <div th:if="${outbidBids.size() == 0}" class="text-center py-5">
+                            <i class="fas fa-frown fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Outbid Bids</h4>
+                            <p class="text-muted">You haven't been outbid on any auctions.</p>
+                        </div>
+                        
+                        <div th:if="${outbidBids.size() > 0}" class="row">
+                            <div class="col-12" th:each="bid : ${outbidBids}">
+                                <div class="card mb-3 border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <i class="fas fa-exclamation-triangle"></i> You've been outbid on this auction
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-3">
+                                                <div th:if="${bid.product.imageUrl == null or bid.product.imageUrl == ''}" class="text-center">
+                                                    <div class="border rounded p-3" style="height: 100px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
+                                                <img th:if="${bid.product.imageUrl != null and bid.product.imageUrl != ''}" 
+                                                     th:src="${bid.product.imageUrl}" class="img-fluid rounded" 
+                                                     th:alt="${bid.product.title}" style="height: 100px; width: 100%; object-fit: cover;" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="card-title">
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="text-decoration-none" th:text="${bid.product.title}"></a>
+                                                </h5>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Your Bid:</strong> <span th:text="'₹' + ${bid.bidAmount}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Current Highest:</strong> <span class="text-danger fw-bold" th:text="'₹' + ${bid.product.currentHighestBid}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Auction Ends:</strong> <span th:text="${bid.product.auctionEndTime}"></span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-3 text-end">
+                                                <div class="mb-2" th:if="${bid.product.status.name() == 'ACTIVE'}">
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-gavel"></i> Bid Again
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i> View Auction
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Won Auctions Tab -->
+                    <div class="tab-pane fade" id="won" role="tabpanel">
+                        <div th:if="${wonBids.size() == 0}" class="text-center py-5">
+                            <i class="fas fa-medal fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Won Auctions</h4>
+                            <p class="text-muted">You haven't won any auctions yet.</p>
+                        </div>
+                        
+                        <div th:if="${wonBids.size() > 0}" class="row">
+                            <div class="col-12" th:each="bid : ${wonBids}">
+                                <div class="card mb-3 border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <i class="fas fa-medal"></i> Congratulations! You won this auction!
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-3">
+                                                <div th:if="${bid.product.imageUrl == null or bid.product.imageUrl == ''}" class="text-center">
+                                                    <div class="border rounded p-3" style="height: 100px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                                    </div>
+                                                </div>
+                                                <img th:if="${bid.product.imageUrl != null and bid.product.imageUrl != ''}" 
+                                                     th:src="${bid.product.imageUrl}" class="img-fluid rounded" 
+                                                     th:alt="${bid.product.title}" style="height: 100px; width: 100%; object-fit: cover;" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="card-title">
+                                                    <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="text-decoration-none" th:text="${bid.product.title}"></a>
+                                                </h5>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Winning Bid:</strong> <span class="text-info fw-bold" th:text="'₹' + ${bid.bidAmount}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Auction Ended:</strong> <span th:text="${bid.product.auctionEndTime}"></span>
+                                                </p>
+                                                <p class="text-muted mb-1">
+                                                    <strong>Seller:</strong> <span th:text="${bid.product.seller.fullName}"></span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-3 text-end">
+                                                <a th:href="@{'/buyer/auction/' + ${bid.product.id}}" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i> View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Real-time IST Clock Script -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const istTime = new Date(utc + istOffset);
+            
+            const hours = String(istTime.getHours()).padStart(2, '0');
+            const minutes = String(istTime.getMinutes()).padStart(2, '0');
+            const seconds = String(istTime.getSeconds()).padStart(2, '0');
+            
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' };
+            const dateStr = istTime.toLocaleDateString('en-IN', options);
+            
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            const clockElement = document.getElementById('liveClock');
+            
+            if (clockElement) {
+                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
+            }
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>Manage Products - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
+            <div class="navbar-nav ms-auto">
+                <!-- Real-time IST Clock -->
+                <div class="navbar-text me-4">
+                    <i class="fas fa-clock text-warning"></i>
+                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
+                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
+                </div>
+                
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link active" href="/admin/products"><i class="fas fa-box"></i> Manage Products</a>
+                <a class="nav-link" href="/admin/users"><i class="fas fa-users"></i> Manage Users</a>
+                <a class="nav-link" href="/admin/slots"><i class="fas fa-clock"></i> Auction Slots</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <div class="container mt-3" th:if="${success != null or error != null}">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-box"></i> Manage Products</h1>
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Products Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list"></i> All Products</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No products found</h5>
+                    <p class="text-muted">There are no products in the system yet.</p>
+                </div>
+                
+                <div th:if="${!#lists.isEmpty(products)}" class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Seller</th>
+                                <th>Starting Price</th>
+                                <th>Current Bid</th>
+                                <th>Status</th>
+                                <th>Auction Period</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="product : ${products}">
+                                <td>
+                                    <div>
+                                        <strong th:text="${product.title}"></strong>
+                                        <br/>
+                                        <small class="text-muted" th:text="${product.description}"></small>
+                                    </div>
+                                </td>
+                                <td th:text="${product.seller.fullName}"></td>
+                                <td th:text="'₹' + ${product.startingPrice}"></td>
+                                <td th:text="'₹' + ${product.currentHighestBid}"></td>
+                                <td>
+                                    <span th:if="${product.status.name() == 'PENDING'}" class="badge bg-warning">Pending</span>
+                                    <span th:if="${product.status.name() == 'APPROVED'}" class="badge bg-success">Approved</span>
+                                    <span th:if="${product.status.name() == 'REJECTED'}" class="badge bg-danger">Rejected</span>
+                                    <span th:if="${product.status.name() == 'COMPLETED'}" class="badge bg-info">Completed</span>
+                                    <span th:if="${product.status.name() == 'CANCELLED'}" class="badge bg-secondary">Cancelled</span>
+                                </td>
+                                <td>
+                                    <small>
+                                        <strong>Start:</strong> <span th:text="${product.auctionStartTime}"></span><br/>
+                                        <strong>End:</strong> <span th:text="${product.auctionEndTime}"></span>
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <form th:if="${product.canBeDeleted()}" 
+                                              style="display: inline;" 
+                                              method="post" 
+                                              th:action="@{'/admin/product/delete/' + ${product.id}}"
+                                              onsubmit="return confirm('Are you sure you want to delete this product? This action cannot be undone.')">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete Product">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                        <span th:if="${!product.canBeDeleted()}" class="text-muted">
+                                            <small>Cannot delete after slot starts</small>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Real-time IST Clock Script -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const istTime = new Date(utc + istOffset);
+            
+            const hours = String(istTime.getHours()).padStart(2, '0');
+            const minutes = String(istTime.getMinutes()).padStart(2, '0');
+            const seconds = String(istTime.getSeconds()).padStart(2, '0');
+            
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' };
+            const dateStr = istTime.toLocaleDateString('en-IN', options);
+            
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            const clockElement = document.getElementById('liveClock');
+            
+            if (clockElement) {
+                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
+            }
+        }
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>Add Product - Auction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/seller/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
+            <div class="navbar-nav ms-auto">
+                <!-- Real-time IST Clock -->
+                <div class="navbar-text me-4">
+                    <i class="fas fa-clock text-warning"></i>
+                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
+                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
+                </div>
+                
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Seller Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/seller/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="/seller/products"><i class="fas fa-box"></i> My Products</a>
+                <a class="nav-link active" href="/seller/product/add"><i class="fas fa-plus"></i> Add Product</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <div class="container mt-3" th:if="${success != null or error != null}">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-plus"></i> Add New Product</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/seller/product/add">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Product Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" required="required" 
+                           th:value="${title}" placeholder="Enter product title"/>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required="required" 
+                              placeholder="Enter product description" th:text="${description}"></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="startingPrice" class="form-label">Starting Price (₹) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="startingPrice" name="startingPrice" 
+                                   step="0.01" min="0.01" required="required" th:value="${startingPrice}" 
+                                   placeholder="0.00"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="reservePrice" class="form-label">Reserve Price (₹)</label>
+                            <input type="number" class="form-control" id="reservePrice" name="reservePrice" 
+                                   step="0.01" min="0" th:value="${reservePrice}" 
+                                   placeholder="0.00 (Optional)"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="auctionSlotId" class="form-label">Auction Time Slot <span class="text-danger">*</span></label>
+                    <select class="form-select" id="auctionSlotId" name="auctionSlotId" required="required">
+                        <option value="">Select an auction slot...</option>
+                        <option th:each="slot : ${availableSlots}" 
+                                th:value="${slot.id}" 
+                                th:text="${slot.slotDate} + ' - ' + ${slot.timeRange} + ' (' + ${slot.currentProducts} + '/' + ${slot.maxProducts} + ' products)'">
+                        </option>
+                    </select>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i> 
+                        Each slot is 1 hour long and can accommodate up to 3 products. 
+                        Available slots are from 9:00 AM to 5:00 PM.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="imageUrl" class="form-label">Image URL</label>
+                    <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
+                           th:value="${imageUrl}" placeholder="https://example.com/image.jpg (Optional)"/>
+                </div>                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Note:</strong> Your product will be submitted for admin approval before it appears in auctions.
+                            </div>
+
+                            <div class="text-end">
+                                <a href="/seller/products" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Add Product
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Set minimum date to current date/time
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const localDateTime = now.toISOString().slice(0, 16);
+            document.getElementById('auctionStartTime').min = localDateTime;
+            document.getElementById('auctionEndTime').min = localDateTime;
+            
+            // Update end time minimum when start time changes
+            document.getElementById('auctionStartTime').addEventListener('change', function() {
+                document.getElementById('auctionEndTime').min = this.value;
+            });
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+        
+        // Real-time IST Clock - outside DOM ready to ensure it loads
+        function updateClock() {
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const istTime = new Date(utc + istOffset);
+            
+            const hours = String(istTime.getHours()).padStart(2, '0');
+            const minutes = String(istTime.getMinutes()).padStart(2, '0');
+            const seconds = String(istTime.getSeconds()).padStart(2, '0');
+            
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' };
+            const dateStr = istTime.toLocaleDateString('en-IN', options);
+            
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            const clockElement = document.getElementById('liveClock');
+            
+            if (clockElement) {
+                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
+            }
+        }
+        
+        // Start clock immediately 
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

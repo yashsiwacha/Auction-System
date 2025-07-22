@@ -1,0 +1,31 @@
+# PostgreSQL Production configuration
+spring:
+  profiles.active: prod
+  thymeleaf.cache: true
+  main.show-banner: false
+  
+  # PostgreSQL Database Configuration
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/auction_system}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    
+  # JPA Configuration for PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          time_zone: Asia/Kolkata
+
+# Server Configuration for Production
+server:
+  port: ${PORT:9090}
+  compression:
+    enabled: true
