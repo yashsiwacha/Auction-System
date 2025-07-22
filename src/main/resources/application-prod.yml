@@ -9,16 +9,17 @@ spring:
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/Auction_System?createDatabaseIfNotExist=true&useSSL=true&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
     
   # JPA Configuration for Production
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    database-platform: ${DATABASE_DIALECT:org.hibernate.dialect.MySQLDialect}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: ${DATABASE_DIALECT:org.hibernate.dialect.MySQLDialect}
         format_sql: false
         jdbc:
           time_zone: Asia/Kolkata
@@ -26,8 +27,7 @@ spring:
 # Server Configuration for Production
 server:
   port: ${PORT:9090}
-  compression:
-    enabled: true
+  session-timeout: 1800
   
 # Logging for Production
 logging:

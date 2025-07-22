@@ -27,5 +27,4 @@ spring:
 # Server Configuration for Production
 server:
   port: ${PORT:9090}
-  compression:
-    enabled: true
+  session-timeout: 1800
