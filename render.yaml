@@ -1,7 +1,7 @@
 services:
   - type: web
     name: auction-system
-    env: java
+    runtime: java
     buildCommand: ./build.sh
     startCommand: java -Dspring.profiles.active=prod -Dserver.port=$PORT -jar target/auction-system-1.0-SNAPSHOT.jar
     envVars:
