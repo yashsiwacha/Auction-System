@@ -1,9 +1,11 @@
 services:
   - type: web
     name: auction-system
-    runtime: java
-    buildCommand: ./build.sh
-    startCommand: java -Dspring.profiles.active=prod -Dserver.port=$PORT -jar target/auction-system-1.0-SNAPSHOT.jar
+    runtime: docker
+    plan: free
+    buildCommand: docker build -t auction-system .
+    startCommand: java -Dspring.profiles.active=prod -Dserver.port=$PORT -jar app.jar
+    healthCheckPath: /
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
