@@ -101,8 +101,6 @@ public class AdminController {
         
         return "redirect:/admin/products";
     }
-        return "redirect:/admin/products";
-    }
     
     @RequestMapping(value = "/product/delete/{id}", method = RequestMethod.POST)
     public String deleteProduct(@PathVariable Integer id, 
