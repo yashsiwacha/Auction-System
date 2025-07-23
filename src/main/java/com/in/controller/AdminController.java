@@ -69,7 +69,15 @@ public class AdminController {
             return "redirect:/login";
         }
         
-        // Product approval has been disabled
+        try {
+            Product product = productService.approveProduct(id);
+            redirectAttributes.addFlashAttribute("success", 
+                "Product '" + product.getTitle() + "' approved successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to approve product: " + e.getMessage());
+        }
+        
         return "redirect:/admin/products";
     }
     
@@ -82,7 +90,17 @@ public class AdminController {
             return "redirect:/login";
         }
         
-        // Product rejection has been disabled
+        try {
+            Product product = productService.rejectProduct(id);
+            redirectAttributes.addFlashAttribute("success", 
+                "Product '" + product.getTitle() + "' rejected successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to reject product: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/products";
+    }
         return "redirect:/admin/products";
     }
     
@@ -167,5 +185,16 @@ public class AdminController {
         }
         
         return "redirect:/admin/users";
+    }
+    
+    @RequestMapping(value = "/slots", method = RequestMethod.GET)
+    public String manageSlots(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getRole() != User.UserRole.ADMIN) {
+            return "redirect:/login";
+        }
+        
+        // Redirect to the slots management controller
+        return "redirect:/admin/slots";
     }
 }
