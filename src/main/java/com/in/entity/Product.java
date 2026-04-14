@@ -1,6 +1,6 @@
 package com.in.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +8,10 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products", indexes = {
+    @Index(name = "idx_products_status_end", columnList = "status,auction_end_time"),
+    @Index(name = "idx_products_status_start", columnList = "status,auction_start_time")
+})
 public class Product {
     
     @Id
@@ -40,6 +43,10 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status = ProductStatus.PENDING;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
     
     @Column(name = "image_url")
     private String imageUrl;
@@ -75,6 +82,9 @@ public class Product {
         updatedAt = LocalDateTime.now();
         if (currentHighestBid == null) {
             currentHighestBid = startingPrice;
+        }
+        if (version == null) {
+            version = 0L;
         }
     }
     
@@ -146,6 +156,9 @@ public class Product {
     
     public ProductStatus getStatus() { return status; }
     public void setStatus(ProductStatus status) { this.status = status; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
     
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
@@ -191,3 +204,4 @@ public class Product {
         }
     }
 }
+

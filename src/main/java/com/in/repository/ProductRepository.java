@@ -2,10 +2,13 @@ package com.in.repository;
 
 import com.in.entity.Product;
 import com.in.entity.User;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import jakarta.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,4 +32,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     
     @Query("SELECT p FROM Product p WHERE p.status = 'APPROVED' ORDER BY p.auctionEndTime ASC")
     List<Product> findAllApprovedProducts();
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    Product findByIdForUpdate(@Param("id") Integer id);
 }
+

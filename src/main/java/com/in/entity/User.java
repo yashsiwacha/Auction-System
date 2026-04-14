@@ -1,6 +1,6 @@
 package com.in.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -93,3 +93,4 @@ public class User implements Serializable {
     public List<Bid> getBids() { return bids; }
     public void setBids(List<Bid> bids) { this.bids = bids; }
 }
+

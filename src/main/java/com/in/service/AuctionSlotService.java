@@ -52,9 +52,8 @@ public class AuctionSlotService {
     }
     
     public Optional<AuctionSlot> findById(Integer id) {
-        return auctionSlotRepository.findOne(id) != null ? 
-               Optional.of(auctionSlotRepository.findOne(id)) : 
-               Optional.empty();
+        AuctionSlot slot = auctionSlotRepository.findById(id).orElse(null);
+        return slot != null ? Optional.of(slot) : Optional.empty();
     }
     
     public AuctionSlot save(AuctionSlot slot) {
