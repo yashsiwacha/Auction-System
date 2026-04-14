@@ -1,5 +1,5 @@
-# Use official Maven image with OpenJDK 11
-FROM maven:3.8.6-openjdk-11-slim AS build
+# Use Maven with Java 17 for Spring Boot 3 builds
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 
 # Set working directory
 WORKDIR /app
@@ -16,8 +16,8 @@ COPY src ./src
 # Package the application
 RUN mvn clean package -DskipTests
 
-# Runtime stage with OpenJDK 11
-FROM openjdk:11-jre-slim
+# Runtime stage with Java 17
+FROM eclipse-temurin:17-jre
 
 # Set working directory
 WORKDIR /app
@@ -36,4 +36,4 @@ EXPOSE 8080
 ENV JAVA_OPTS="-Xmx256m -Xms128m"
 
 # Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dspring.profiles.active=prod -Dserver.port=${PORT:-8080} -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod,postgres} -Dserver.port=${PORT:-8080} -jar app.jar"]

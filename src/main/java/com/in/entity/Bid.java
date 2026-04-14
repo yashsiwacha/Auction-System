@@ -1,11 +1,15 @@
 package com.in.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bids")
+@Table(name = "bids", indexes = {
+    @Index(name = "idx_bids_listing_amount", columnList = "listing_id,bid_amount"),
+    @Index(name = "idx_bids_listing_time", columnList = "listing_id,bid_time"),
+    @Index(name = "idx_bids_buyer_time", columnList = "buyer_id,bid_time")
+})
 public class Bid {
     
     @Id
@@ -68,3 +72,4 @@ public class Bid {
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
 }
+

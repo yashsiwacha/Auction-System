@@ -69,12 +69,17 @@ public class ProductService {
     }
     
     public Optional<Product> findById(Integer id) {
-        return productRepository.findOne(id) != null ? 
-               Optional.of(productRepository.findOne(id)) : Optional.empty();
+        Product product = productRepository.findById(id).orElse(null);
+        return product != null ? Optional.of(product) : Optional.empty();
+    }
+
+    public Optional<Product> findByIdForUpdate(Integer id) {
+        Product product = productRepository.findByIdForUpdate(id);
+        return product != null ? Optional.of(product) : Optional.empty();
     }
     
     public Product approveProduct(Integer productId) {
-        Product product = productRepository.findOne(productId);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             product.setStatus(Product.ProductStatus.APPROVED);
             return saveProduct(product);
@@ -83,7 +88,7 @@ public class ProductService {
     }
     
     public Product rejectProduct(Integer productId) {
-        Product product = productRepository.findOne(productId);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             product.setStatus(Product.ProductStatus.REJECTED);
             return saveProduct(product);
@@ -96,7 +101,7 @@ public class ProductService {
     }
     
     public Product updateCurrentHighestBid(Integer productId, BigDecimal newBidAmount) {
-        Product product = productRepository.findOne(productId);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             product.setCurrentHighestBid(newBidAmount);
             return saveProduct(product);
@@ -105,7 +110,7 @@ public class ProductService {
     }
     
     public void endAuction(Integer productId, User winner) {
-        Product product = productRepository.findOne(productId);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             product.setStatus(Product.ProductStatus.COMPLETED);
             product.setWinner(winner);
@@ -126,6 +131,6 @@ public class ProductService {
     }
     
     public void deleteProduct(Integer productId) {
-        productRepository.delete(productId);
+        productRepository.deleteById(productId);
     }
 }

@@ -1,250 +1,152 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Search Auctions - Auction System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/buyer/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
-            <div class="navbar-nav ms-auto">
-                <!-- Real-time IST Clock -->
-                <div class="navbar-text me-4">
-                    <i class="fas fa-clock text-warning"></i>
-                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
-                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
-                </div>
-                
-                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
-                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Buyer Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <div class="navbar-nav">
-                <a class="nav-link" href="/buyer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a class="nav-link" href="/buyer/auctions"><i class="fas fa-gavel"></i> Browse Auctions</a>
-                <a class="nav-link" href="/buyer/my-bids"><i class="fas fa-hand-holding-usd"></i> My Bids</a>
-                <a class="nav-link active" href="/buyer/search"><i class="fas fa-search"></i> Search</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-search"></i> Search Auctions</h2>
-                </div>
-
-                <!-- Search Form -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5><i class="fas fa-filter"></i> Search &amp; Filter</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="get" th:action="@{/buyer/search}">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="keyword" class="form-label">Keyword</label>
-                                        <input type="text" class="form-control" id="keyword" name="keyword" 
-                                               th:value="${param.keyword}" placeholder="Search for products..." />
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="minPrice" class="form-label">Min Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" id="minPrice" name="minPrice" 
-                                                   th:value="${param.minPrice}" min="0" step="0.01" placeholder="0.00" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label for="maxPrice" class="form-label">Max Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
-                                                   th:value="${param.maxPrice}" min="0" step="0.01" placeholder="1000.00" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Auction Status</label>
-                                        <select class="form-select" id="status" name="status">
-                                            <option value="">All Statuses</option>
-                                            <option value="ACTIVE" th:selected="${param.status == 'ACTIVE'}">Active</option>
-                                            <option value="COMPLETED" th:selected="${param.status == 'COMPLETED'}">Completed</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="sortBy" class="form-label">Sort By</label>
-                                        <select class="form-select" id="sortBy" name="sortBy">
-                                            <option value="endTime" th:selected="${param.sortBy == 'endTime' or param.sortBy == null}">Ending Soon</option>
-                                            <option value="startingPrice" th:selected="${param.sortBy == 'startingPrice'}">Starting Price</option>
-                                            <option value="currentHighestBid" th:selected="${param.sortBy == 'currentHighestBid'}">Current Bid</option>
-                                            <option value="title" th:selected="${param.sortBy == 'title'}">Title (A-Z)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="sortOrder" class="form-label">Sort Order</label>
-                                        <select class="form-select" id="sortOrder" name="sortOrder">
-                                            <option value="asc" th:selected="${param.sortOrder == 'asc' or param.sortOrder == null}">Ascending</option>
-                                            <option value="desc" th:selected="${param.sortOrder == 'desc'}">Descending</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary me-2">
-                                        <i class="fas fa-search"></i> Search
-                                    </button>
-                                    <a href="/buyer/search" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times"></i> Clear
-                                    </a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Search Results -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-list"></i> Search Results</h5>
-                        <span class="badge bg-primary" th:if="${searchResults != null}" th:text="${searchResults.size()} + ' results found'"></span>
-                    </div>
-                    <div class="card-body">
-                        <!-- No Search Performed Yet -->
-                        <div th:if="${searchResults == null}" class="text-center py-5">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">Start Your Search</h4>
-                            <p class="text-muted">Use the search form above to find auctions that interest you.</p>
-                        </div>
-
-                        <!-- No Results Found -->
-                        <div th:if="${searchResults != null and searchResults.size() == 0}" class="text-center py-5">
-                            <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Results Found</h4>
-                            <p class="text-muted">Try adjusting your search criteria or browse all auctions.</p>
-                            <a href="/buyer/auctions" class="btn btn-primary">Browse All Auctions</a>
-                        </div>
-
-                        <!-- Results Found -->
-                        <div th:if="${searchResults != null and searchResults.size() > 0}">
-                            <div class="row">
-                                <div class="col-md-6 col-lg-4 mb-4" th:each="product : ${searchResults}">
-                                    <div class="card h-100">
-                                        <!-- Product Image -->
-                                        <div class="position-relative">
-                                            <div th:if="${product.imageUrl == null or product.imageUrl == ''}" class="text-center" style="height: 200px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                                <i class="fas fa-image fa-3x text-muted"></i>
-                                            </div>
-                            <img th:if="${product.imageUrl != null and product.imageUrl != ''}" 
-                                 th:src="${product.imageUrl}" class="card-img-top" 
-                                 th:alt="${product.title}" style="height: 200px; object-fit: cover;" />
-                                            <!-- Status Badge -->
-                                            <div class="position-absolute top-0 end-0 m-2">
-                                                <span class="badge bg-success" th:if="${product.status.name() == 'ACTIVE'}">Active</span>
-                                                <span class="badge bg-info" th:if="${product.status.name() == 'COMPLETED'}">Ended</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="card-body d-flex flex-column">
-                                            <h5 class="card-title" th:text="${product.title}"></h5>
-                                            <p class="card-text text-muted flex-grow-1" th:text="${product.description}"></p>
-                                            
-                                            <div class="mt-auto">
-                                                <div class="row text-center mb-3">
-                                                    <div class="col-6">
-                                                        <small class="text-muted">Starting Price</small><br/>
-                                                        <strong th:text="'₹' + ${product.startingPrice}"></strong>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <small class="text-muted">Current Bid</small><br/>
-                                                        <strong class="text-danger" th:text="'₹' + ${product.currentHighestBid}"></strong>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row text-center mb-3">
-                                                    <div class="col-12">
-                                                        <small class="text-muted">Auction Ends</small><br/>
-                                                        <small th:text="${product.auctionEndTime}"></small>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row text-center mb-3">
-                                                    <div class="col-12">
-                                                        <small class="text-muted">Seller</small><br/>
-                                                        <small th:text="${product.seller.fullName}"></small>
-                                                    </div>
-                                                </div>
-
-                                                <div class="d-grid">
-                                                    <a th:href="@{'/buyer/auction/' + ${product.id}}" class="btn btn-primary">
-                                                        <i class="fas fa-eye"></i> View Details
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Real-time IST Clock Script -->
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Search | Auction System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
-        function updateClock() {
-            const now = new Date();
-            const istOffset = 5.5 * 60 * 60 * 1000;
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const istTime = new Date(utc + istOffset);
-            
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            const seconds = String(istTime.getSeconds()).padStart(2, '0');
-            
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' };
-            const dateStr = istTime.toLocaleDateString('en-IN', options);
-            
-            const timeString = `${hours}:${minutes}:${seconds}`;
-            const clockElement = document.getElementById('liveClock');
-            
-            if (clockElement) {
-                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#f9f9fd",
+                        primary: "#001736",
+                        secondary: "#006d43",
+                        outline: "#747780",
+                        "surface-container-low": "#f3f3f7",
+                        "surface-container": "#edeef1",
+                        "surface-container-high": "#e7e8eb"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    }
+                }
             }
         }
-        
-        updateClock();
-        setInterval(updateClock, 1000);
     </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
+                radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
+                #f9f9fd;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-enter {
+            animation: pageIn 280ms ease-out;
+        }
+    </style>
+</head>
+<body class="font-body text-slate-900 overflow-x-hidden">
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-8">
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">Auction System</span>
+        <nav class="hidden md:flex gap-6 items-center">
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/dashboard">Dashboard</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/auctions">Auctions</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/my-bids">History</a>
+            <a class="font-headline tracking-tight text-blue-900 border-b-2 border-blue-900 pb-1" href="/buyer/search">Search</a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="hidden sm:inline text-sm text-slate-700" th:text="${user.fullName}">Buyer</span>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/logout">
+            <span class="material-symbols-outlined text-slate-600">logout</span>
+        </a>
+    </div>
+</header>
+
+<main class="pt-24 p-6 page-enter">
+    <div class="max-w-[1300px] mx-auto">
+        <div class="mb-8">
+            <h1 class="font-headline text-4xl font-bold tracking-tight text-primary mb-2">Search Marketplace</h1>
+            <p class="text-outline text-sm">Find items by title or description and jump directly into auction rooms.</p>
+        </div>
+
+        <section class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-6">
+            <form class="flex flex-col md:flex-row gap-3" method="get" th:action="@{/buyer/search}">
+                <div class="flex-1">
+                    <label class="text-xs uppercase tracking-wider text-outline font-semibold" for="query">Keyword</label>
+                    <input class="mt-1 w-full rounded-lg border-slate-300 bg-surface-container-low text-sm px-3 py-2 focus:ring-2 focus:ring-blue-300"
+                           id="query" name="query" th:value="${query}" placeholder="Try: watch, painting, vintage" type="text"/>
+                </div>
+                <div class="md:self-end flex gap-2">
+                    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-blue-700 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all" type="submit">
+                        <span class="material-symbols-outlined text-base">search</span>
+                        Search
+                    </button>
+                    <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" href="/buyer/search">
+                        <span class="material-symbols-outlined text-base">close</span>
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <section class="bg-surface-container-low rounded-xl p-4 mb-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h2 class="font-headline text-xl font-bold text-primary">Results</h2>
+                <span class="text-xs uppercase tracking-wider text-outline font-semibold" th:text="${searchResults != null ? #lists.size(searchResults) : 0} + ' items'">0 items</span>
+            </div>
+        </section>
+
+        <div th:if="${searchResults == null}" class="bg-white border border-slate-200 rounded-xl p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-slate-400">travel_explore</span>
+            <h3 class="font-headline text-2xl text-primary mt-3">Start with a keyword</h3>
+            <p class="text-outline mt-1">Type a keyword above and we will match title and description across approved auctions.</p>
+        </div>
+
+        <div th:if="${searchResults != null and #lists.isEmpty(searchResults)}" class="bg-white border border-slate-200 rounded-xl p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-slate-400">search_off</span>
+            <h3 class="font-headline text-2xl text-primary mt-3">No matches found</h3>
+            <p class="text-outline mt-1">Try broader terms or switch to full auction browsing.</p>
+            <a class="inline-block mt-4 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold" href="/buyer/auctions">Browse All Auctions</a>
+        </div>
+
+        <div th:if="${searchResults != null and !#lists.isEmpty(searchResults)}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <article th:each="product : ${searchResults}" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div class="h-48 bg-surface-container-high relative">
+                    <img th:if="${product.imageUrl != null and product.imageUrl != ''}" th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-full object-cover"/>
+                    <div th:if="${product.imageUrl == null or product.imageUrl == ''}" class="w-full h-full flex items-center justify-center text-slate-500">
+                        <span class="material-symbols-outlined text-5xl">image</span>
+                    </div>
+                    <span class="absolute top-3 right-3 text-[10px] uppercase tracking-wider px-2 py-1 rounded bg-white/90 font-semibold"
+                          th:classappend="${product.status.name() == 'ACTIVE'} ? ' text-green-700' : ' text-slate-700'"
+                          th:text="${product.status}">ACTIVE</span>
+                </div>
+
+                <div class="p-4">
+                    <h3 class="font-headline text-xl font-bold text-primary line-clamp-1" th:text="${product.title}">Title</h3>
+                    <p class="text-sm text-slate-600 mt-1 line-clamp-2" th:text="${product.description}">Description</p>
+                    <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
+                        <div class="bg-surface-container-low rounded-lg px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Starting</p>
+                            <p class="font-semibold text-primary" th:text="'₹' + ${product.startingPrice}">₹0</p>
+                        </div>
+                        <div class="bg-surface-container-low rounded-lg px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Current</p>
+                            <p class="font-semibold text-secondary" th:text="'₹' + ${product.currentHighestBid}">₹0</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-outline mt-3" th:text="'Ends: ' + ${product.auctionEndTime}">Ends: --</p>
+                    <a th:href="@{'/buyer/auction/' + ${product.id}}" class="mt-4 w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all">
+                        <span class="material-symbols-outlined text-base">visibility</span>
+                        Open Auction
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</main>
 </body>
 </html>

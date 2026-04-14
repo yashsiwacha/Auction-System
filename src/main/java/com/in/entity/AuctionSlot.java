@@ -1,6 +1,6 @@
 package com.in.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -88,3 +88,4 @@ public class AuctionSlot {
         return startTime + " - " + endTime;
     }
 }
+

@@ -53,7 +53,7 @@ public class UserService {
     }
     
     public Optional<User> findById(Integer id) {
-        User user = userRepository.findOne(id);
+        User user = userRepository.findById(id).orElse(null);
         return user != null ? Optional.of(user) : Optional.empty();
     }
     
@@ -74,7 +74,7 @@ public class UserService {
     }
     
     public void deactivateUser(Integer userId) {
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             user.setIsActive(false);
             updateUser(user);
@@ -82,7 +82,7 @@ public class UserService {
     }
     
     public void activateUser(Integer userId) {
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             user.setIsActive(true);
             updateUser(user);
@@ -97,7 +97,7 @@ public class UserService {
     }
     
     public boolean changePassword(Integer userId, String oldPassword, String newPassword) {
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findById(userId).orElse(null);
         if (user != null && passwordEncoder.matches(oldPassword, user.getPassword())) {
             user.setPassword(passwordEncoder.encode(newPassword));
             updateUser(user);

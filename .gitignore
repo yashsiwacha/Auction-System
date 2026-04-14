@@ -41,3 +41,6 @@ Thumbs.db
 
 # Application specific
 application-local.yml
+
+# Local smoke-test/debug artifacts
+.tmp-*

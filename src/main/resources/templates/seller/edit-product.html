@@ -1,301 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"></meta>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-    <title>Edit Product - Auction System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"></link>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/seller/dashboard"><i class="fas fa-gavel"></i> Auction System</a>
-            <div class="navbar-nav ms-auto">
-                <!-- Real-time IST Clock -->
-                <div class="navbar-text me-4">
-                    <i class="fas fa-clock text-warning"></i>
-                    <span class="text-warning fw-bold" id="liveClock">Loading...</span>
-                    <small class="text-muted d-block" style="font-size: 0.7em;">IST</small>
-                </div>
-                
-                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
-                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Seller Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <div class="navbar-nav">
-                <a class="nav-link" href="/seller/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a class="nav-link" href="/seller/products"><i class="fas fa-box"></i> My Products</a>
-                <a class="nav-link" href="/seller/add-product"><i class="fas fa-plus"></i> Add Product</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Alert Messages -->
-    <div class="container mt-3" th:if="${success != null or error != null}">
-        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-            <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-            <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/seller/dashboard">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="/seller/products">My Products</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
-                    </ol>
-                </nav>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h4><i class="fas fa-edit"></i> Edit Product</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" th:action="@{'/seller/edit-product/' + ${product.id}}" th:object="${product}">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="title" class="form-label">Product Title <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="title" th:field="*{title}" required="required" maxlength="255"/>
-                                        <div class="form-text">Enter a descriptive title for your product (max 255 characters)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-                                        <textarea class="form-control" id="description" th:field="*{description}" rows="4" required="required" maxlength="1000"></textarea>
-                                        <div class="form-text">Provide a detailed description of your product (max 1000 characters)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="startingPrice" class="form-label">Starting Price <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" id="startingPrice" th:field="*{startingPrice}" 
-                                                   min="0.01" step="0.01" required="required"/>
-                                        </div>
-                                        <div class="form-text">The minimum price to start bidding</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="reservePrice" class="form-label">Reserve Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" id="reservePrice" th:field="*{reservePrice}" 
-                                                   min="0.01" step="0.01">
-                                        </div>
-                                        <div class="form-text">Minimum price you're willing to accept (optional)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="auctionStartTime" class="form-label">Auction Start Time <span class="text-danger">*</span></label>
-                                        <input type="datetime-local" class="form-control" id="auctionStartTime" th:field="*{auctionStartTime}" required />
-                                        <div class="form-text">When the auction should begin</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="auctionEndTime" class="form-label">Auction End Time <span class="text-danger">*</span></label>
-                                        <input type="datetime-local" class="form-control" id="auctionEndTime" th:field="*{auctionEndTime}" required />
-                                        <div class="form-text">When the auction should end</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label for="imageUrl" class="form-label">Image URL</label>
-                                        <input type="url" class="form-control" id="imageUrl" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg" />
-                                        <div class="form-text">Optional: Provide a direct link to an image of your product</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Current Product Status -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label class="form-label">Current Status</label>
-                                        <div class="p-3 border rounded bg-light">
-                                            <span class="badge bg-success me-2" th:if="${product.status.name() == 'ACTIVE'}">Active</span>
-                                            <span class="badge bg-warning me-2" th:if="${product.status.name() == 'PENDING'}">Pending Approval</span>
-                                            <span class="badge bg-info me-2" th:if="${product.status.name() == 'COMPLETED'}">Completed</span>
-                                            
-                                            <div class="mt-2">
-                                                <small class="text-muted">Current Highest Bid: </small>
-                                                <strong class="text-danger" th:text="'₹' + ${product.currentHighestBid}"></strong>
-                                            </div>
-                                            
-                                            <div th:if="${product.status.name() == 'PENDING'}" class="mt-2">
-                                                <small class="text-info">
-                                                    <i class="fas fa-info-circle"></i> 
-                                                    This product is waiting for admin approval. You can edit it until it's approved.
-                                                </small>
-                                            </div>
-                                            
-                                            <div th:if="${product.status.name() == 'ACTIVE' and product.currentHighestBid > 0}" class="mt-2">
-                                                <small class="text-warning">
-                                                    <i class="fas fa-exclamation-triangle"></i> 
-                                                    This auction has active bids. Some changes may not be possible.
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Image Preview -->
-                            <div class="row" th:if="${product.imageUrl != null and product.imageUrl != ''}">
-                                <div class="col-md-12">
-                                    <div class="mb-3">
-                                        <label class="form-label">Current Image Preview</label>
-                                        <div class="text-center p-3 border rounded">
-                                            <img th:src="${product.imageUrl}" class="img-fluid rounded" 
-                                                 th:alt="${product.title}" style="max-height: 200px;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save"></i> Update Product
-                                        </button>
-                                        <a href="/seller/products" class="btn btn-secondary">
-                                            <i class="fas fa-times"></i> Cancel
-                                        </a>
-                                        <div class="ms-auto" th:if="${product.status.name() == 'PENDING'}">
-                                            <form method="post" th:action="@{'/seller/delete-product/' + ${product.id}}" 
-                                                  onsubmit="return confirm('Are you sure you want to delete this product? This action cannot be undone.')" 
-                                                  style="display: inline;">
-                                                <button type="submit" class="btn btn-danger">
-                                                    <i class="fas fa-trash"></i> Delete Product
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Edit Guidelines -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h6><i class="fas fa-info-circle"></i> Edit Guidelines</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="text-success">You Can Edit:</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="fas fa-check text-success"></i> Product title and description</li>
-                                    <li><i class="fas fa-check text-success"></i> Image URL</li>
-                                    <li><i class="fas fa-check text-success"></i> Reserve price (if no bids yet)</li>
-                                    <li><i class="fas fa-check text-success"></i> Auction end time (extend only)</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-danger">Restrictions:</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="fas fa-times text-danger"></i> Starting price (once approved)</li>
-                                    <li><i class="fas fa-times text-danger"></i> Auction start time (once started)</li>
-                                    <li><i class="fas fa-times text-danger"></i> Major changes with active bids</li>
-                                    <li><i class="fas fa-times text-danger"></i> Completed auctions</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Set minimum datetime for auction start and end times
-        document.addEventListener('DOMContentLoaded', function() {
-            var now = new Date();
-            var isoString = now.toISOString().slice(0, 16);
-            
-            var startTimeInput = document.getElementById('auctionStartTime');
-            var endTimeInput = document.getElementById('auctionEndTime');
-            
-            // Only set minimum for future dates
-            if (startTimeInput.value === '') {
-                startTimeInput.min = isoString;
-            }
-            if (endTimeInput.value === '') {
-                endTimeInput.min = isoString;
-            }
-            
-            // Ensure end time is after start time
-            startTimeInput.addEventListener('change', function() {
-                endTimeInput.min = this.value;
-                if (endTimeInput.value && endTimeInput.value <= this.value) {
-                    var startDate = new Date(this.value);
-                    startDate.setHours(startDate.getHours() + 1);
-                    endTimeInput.value = startDate.toISOString().slice(0, 16);
-                }
-            });
-        });
-        
-        // Real-time IST Clock
-        function updateClock() {
-            const now = new Date();
-            const istOffset = 5.5 * 60 * 60 * 1000;
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const istTime = new Date(utc + istOffset);
-            
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            const seconds = String(istTime.getSeconds()).padStart(2, '0');
-            
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' };
-            const dateStr = istTime.toLocaleDateString('en-IN', options);
-            
-            const timeString = `${hours}:${minutes}:${seconds}`;
-            const clockElement = document.getElementById('liveClock');
-            
-            if (clockElement) {
-                clockElement.innerHTML = `<div>${timeString}</div><small style="font-size: 0.7em;">${dateStr}</small>`;
-            }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Product | Auction System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f8ff;
+            --panel: #ffffff;
+            --line: #d7e1f3;
         }
-        
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
+        body {
+            font-family: Inter, sans-serif;
+            background:
+                radial-gradient(circle at 3% -10%, #dbeafe 0%, #dbeafe00 42%),
+                radial-gradient(circle at 96% 3%, #ecfccb 0%, #ecfccb00 32%),
+                var(--bg);
+        }
+        .font-display { font-family: "Space Grotesk", sans-serif; }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900">
+    <header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <a href="/seller/dashboard" class="font-display text-lg font-bold tracking-tight">Auction System</a>
+            <nav class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+                <a href="/seller/dashboard" class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100">Dashboard</a>
+                <a href="/seller/products" class="rounded-full bg-blue-100 px-3 py-1.5 text-blue-700">Products</a>
+                <a href="/logout" class="rounded-full px-3 py-1.5 text-rose-600 hover:bg-rose-50">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <section th:if="${success != null or error != null}" class="mb-6 space-y-3">
+            <div th:if="${success}" class="panel border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" th:text="${success}"></div>
+            <div th:if="${error}" class="panel border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" th:text="${error}"></div>
+        </section>
+
+        <section class="mb-6 panel border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
+            Product editing is currently disabled in the backend. This screen is kept ready for future re-enable.
+        </section>
+
+        <section class="panel p-6 sm:p-8" th:if="${product != null}">
+            <h1 class="font-display text-3xl font-bold tracking-tight">Edit Product</h1>
+            <p class="mt-1 text-sm text-slate-600">Update listing details while respecting auction constraints.</p>
+
+            <form class="mt-8 grid gap-5" method="post" th:action="@{'/seller/product/edit/' + ${product.id}}">
+                <div>
+                    <label for="title" class="mb-1 block text-sm font-semibold text-slate-700">Title</label>
+                    <input id="title" name="title" type="text" required="required" th:value="${product.title}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                </div>
+
+                <div>
+                    <label for="description" class="mb-1 block text-sm font-semibold text-slate-700">Description</label>
+                    <textarea id="description" name="description" rows="4" required="required" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" th:text="${product.description}"></textarea>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="startingPrice" class="mb-1 block text-sm font-semibold text-slate-700">Starting Price (Rs)</label>
+                        <input id="startingPrice" name="startingPrice" type="number" min="0.01" step="0.01" required="required" th:value="${product.startingPrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                    <div>
+                        <label for="reservePrice" class="mb-1 block text-sm font-semibold text-slate-700">Reserve Price</label>
+                        <input id="reservePrice" name="reservePrice" type="number" min="0.01" step="0.01" th:value="${product.reservePrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="auctionStartTime" class="mb-1 block text-sm font-semibold text-slate-700">Auction Start</label>
+                        <input id="auctionStartTime" name="auctionStartTime" type="datetime-local" required="required" th:value="${product.auctionStartTime != null ? #temporals.format(product.auctionStartTime, 'yyyy-MM-dd''T''HH:mm') : ''}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                    <div>
+                        <label for="auctionEndTime" class="mb-1 block text-sm font-semibold text-slate-700">Auction End</label>
+                        <input id="auctionEndTime" name="auctionEndTime" type="datetime-local" required="required" th:value="${product.auctionEndTime != null ? #temporals.format(product.auctionEndTime, 'yyyy-MM-dd''T''HH:mm') : ''}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="imageUrl" class="mb-1 block text-sm font-semibold text-slate-700">Image URL</label>
+                    <input id="imageUrl" name="imageUrl" type="url" th:value="${product.imageUrl}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    Current status: <span class="font-semibold" th:text="${product.status}">PENDING</span>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-1">
+                    <a href="/seller/products" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Back</a>
+                    <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Save Changes</button>
+                </div>
+            </form>
+        </section>
+
+        <section th:if="${product == null}" class="panel px-6 py-8 text-center">
+            <p class="text-lg font-semibold text-slate-800">Product data unavailable</p>
+            <a href="/seller/products" class="mt-4 inline-flex rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Return to Products</a>
+        </section>
+    </main>
 </body>
 </html>

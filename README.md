@@ -21,6 +21,14 @@ A comprehensive auction system built with Spring Boot and MySQL, featuring three
 - Place bids on products
 - Track bidding history
 - Search for specific products
+- Live highest-bid updates on auction detail page (API polling)
+
+### Concurrency and Consistency
+- Strong consistency for bid placement using database row-level locking (`PESSIMISTIC_WRITE` on product row)
+- Atomic bid transaction: previous winning bid status update + new bid insert + product highest update in one transaction
+- Rollback-safe behavior to prevent partial state updates
+- Optimistic versioning on products using `@Version`
+- Fast highest-bid and timeline queries via database indexes
 
 ## Technology Stack
 
@@ -162,6 +170,44 @@ The application creates the following main tables:
 - `GET /buyer/auctions` - Browse auctions
 - `GET /buyer/auction/{id}` - View auction details
 - `POST /buyer/auction/{id}/bid` - Place bid
+
+### Concurrent Bidding APIs
+- `POST /api/auctions/{id}/bids` - Place bid (JSON body: `bidAmount`, optional `bidderId` for load tests)
+- `GET /api/auctions/{id}/highest-bid` - Current highest bid snapshot
+
+## Consistency Model
+
+This project now uses strong consistency for each auction's bid path.
+
+- Every bid transaction locks the target product row before checking and updating the highest bid.
+- Concurrent stale bids are rejected with `409` rather than overwriting newer winning bids.
+- `currentHighestBid`, winning bid status, and bid history are updated atomically.
+
+Eventual consistency can still be used for non-critical, read-heavy projections (analytics dashboards, recommendation feeds), but winner selection and highest-bid updates must remain strongly consistent.
+
+## Scalability Notes
+
+- Partition workload by auction ID (natural sharding key).
+- Keep bid writes directed to a primary DB node per shard for ordering guarantees.
+- Use read replicas for browse/search pages while bid write path remains strongly consistent.
+- Apply backpressure/rate limits when bid spikes exceed DB lock throughput.
+
+## Load Testing (50-100 Concurrent Bidders)
+
+Use the k6 script in [load-tests/concurrent-bidders.js](load-tests/concurrent-bidders.js).
+
+```bash
+k6 run \
+   -e BASE_URL=http://localhost:9090 \
+   -e AUCTION_ID=1 \
+   -e START_BIDDER_ID=3 \
+   -e BIDDER_COUNT=100 \
+   -e VUS=75 \
+   -e DURATION=45s \
+   load-tests/concurrent-bidders.js
+```
+
+Expected: responses are primarily `201` and `409`, with no `5xx` errors.
 
 ## Configuration
 
