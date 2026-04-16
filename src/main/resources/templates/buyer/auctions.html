@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Auctions | The Digital Curator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#673d00",
+                        "outline": "#75777d",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#2b1700",
+                        "surface-container": "#e5eeff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#bac7dc",
+                        "primary-container": "#101d2c",
+                        "on-surface": "#0b1c30",
+                        "secondary-fixed": "#ffddbb",
+                        "inverse-surface": "#213145",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary": "#ffffff",
+                        "secondary": "#885200",
+                        "secondary-container": "#fe9d00",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed": "#d8e2ff",
+                        "tertiary": "#000107",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed-variant": "#004493",
+                        "on-primary-fixed": "#0f1c2b",
+                        "tertiary-fixed-dim": "#adc7ff",
+                        "primary-fixed": "#d6e3f8",
+                        "background": "#f8f9ff",
+                        "on-secondary-container": "#653c00",
+                        "on-primary-container": "#788598",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#bac7dc",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#001b42",
+                        "primary": "#000104",
+                        "on-primary-fixed-variant": "#3b4858",
+                        "on-tertiary-fixed": "#001a41",
+                        "surface-variant": "#d3e4fe",
+                        "on-surface-variant": "#44474c",
+                        "surface-tint": "#535f71",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c4c6cc",
+                        "on-tertiary-container": "#2481ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#ffb868"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    fontFamily: {
+                        headline: ["Inter"],
+                        body: ["Inter"],
+                        label: ["Inter"]
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #000104 0%, #101d2c 100%);
+        }
+        .gilded-gradient {
+            background: linear-gradient(135deg, #885200 0%, #fe9d00 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(11,28,48,0.06)] flex justify-between items-center px-8 py-4">
+    <div class="flex items-center gap-8">
+        <span class="text-xl font-bold tracking-tighter text-primary">The Digital Curator</span>
+        <div class="hidden md:flex gap-6 items-center">
+            <a class="text-slate-500 hover:text-primary transition-colors font-['Inter'] tracking-tight" href="/buyer/dashboard">Dashboard</a>
+            <a class="text-[#885200] border-b-2 border-[#885200] pb-1 font-['Inter'] tracking-tight" href="/buyer/auctions">Auctions</a>
+            <a class="text-slate-500 hover:text-primary transition-colors font-['Inter'] tracking-tight" href="/buyer/my-bids">My Bids</a>
+            <a class="text-slate-500 hover:text-primary transition-colors font-['Inter'] tracking-tight" href="/buyer/search">Search</a>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="hidden md:inline text-sm text-on-surface-variant" th:text="${user.fullName}">Buyer</span>
+        <a class="material-symbols-outlined text-on-surface cursor-pointer hover:opacity-80 transition-all" href="/logout">logout</a>
+    </div>
+</nav>
+
+<aside class="h-screen w-64 fixed left-0 top-0 pt-20 bg-white flex-col border-r border-transparent hidden xl:flex">
+    <div class="px-6 py-6">
+        <h2 class="text-lg font-black text-[#885200]">System Console</h2>
+        <p class="text-xs text-on-surface-variant">Operator ID: 8821</p>
+    </div>
+    <nav class="flex-1 space-y-1">
+        <div class="bg-[#d3e4fe] text-[#000104] rounded-r-full font-bold px-6 py-3 flex items-center gap-3">
+            <span class="material-symbols-outlined">sensors</span>
+            <span class="text-sm">Live Feed</span>
+        </div>
+        <a class="text-slate-400 hover:bg-slate-100 transition-all px-6 py-3 flex items-center gap-3" href="/buyer/dashboard">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-sm">Dashboard</span>
+        </a>
+        <a class="text-slate-400 hover:bg-slate-100 transition-all px-6 py-3 flex items-center gap-3" href="/buyer/my-bids">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="text-sm">My Bids</span>
+        </a>
+        <a class="text-slate-400 hover:bg-slate-100 transition-all px-6 py-3 flex items-center gap-3" href="/buyer/search">
+            <span class="material-symbols-outlined">search</span>
+            <span class="text-sm">Search</span>
+        </a>
+    </nav>
+    <div class="p-6 border-t border-outline-variant/10">
+        <button class="w-full py-3 bg-error text-white rounded-xl text-sm font-bold uppercase tracking-widest">Emergency Stop</button>
+    </div>
+</aside>
+
+<main class="pt-24 px-8 pb-12 xl:ml-64">
+    <header class="mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+        <div>
+            <h1 class="text-4xl font-extrabold tracking-tighter text-primary">Auction Dashboard</h1>
+            <p class="text-on-surface-variant mt-2 text-lg">Managing high-frequency assets with curated precision.</p>
+        </div>
+        <div class="flex items-center gap-4 bg-surface-container-low px-6 py-3 rounded-2xl">
+            <div class="flex flex-col items-end">
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Active Lots</span>
+                <span class="text-sm font-semibold text-primary" th:text="${auctions != null ? #lists.size(auctions) : 0} + ' listings'">0 listings</span>
+            </div>
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
+    </header>
+
+    <section th:if="${auctions == null or #lists.isEmpty(auctions)}" class="bg-white rounded-3xl p-12 text-center border border-outline-variant/20">
+        <span class="material-symbols-outlined text-6xl text-on-surface-variant">gavel</span>
+        <h2 class="text-2xl font-black text-primary mt-4">No auctions found</h2>
+        <p class="text-on-surface-variant mt-2">Try again later or switch to search.</p>
+        <a class="inline-block mt-6 px-6 py-3 rounded-xl bg-primary text-white font-bold" href="/buyer/search">Open Search</a>
+    </section>
+
+    <section th:if="${auctions != null and !#lists.isEmpty(auctions)}" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16">
+        <article th:each="auction : ${auctions}" class="group">
+            <div class="relative overflow-hidden rounded-2xl bg-surface-container-low aspect-[4/3] flex items-center justify-center p-6">
+                <img th:if="${auction.imageUrl != null and auction.imageUrl != ''}"
+                     th:src="${auction.imageUrl}"
+                     th:alt="${auction.title}"
+                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+                <div th:if="${auction.imageUrl == null or auction.imageUrl == ''}" class="w-full h-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-on-surface-variant">image</span>
+                </div>
+                <div class="absolute top-4 left-4">
+                    <span class="bg-tertiary-container/80 backdrop-blur-md text-on-tertiary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-on-tertiary-container rounded-full animate-pulse"></span>
+                        <span th:text="${auction.status}">LIVE</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-between items-start gap-4">
+                <div class="max-w-[70%]">
+                    <h3 class="text-2xl font-bold tracking-tight text-primary" th:text="${auction.title}">Auction title</h3>
+                    <p class="text-on-surface-variant text-sm mt-1" th:text="${auction.description}">Description</p>
+                </div>
+                <div class="text-right">
+                    <span class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest">Current Bid</span>
+                    <span class="text-2xl font-black text-primary tracking-tighter" th:text="'₹' + ${auction.currentHighestBid}">₹0</span>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex gap-4">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Starts</span>
+                        <span class="text-sm font-semibold text-on-surface" th:text="${auction.auctionStartTime}">--</span>
+                    </div>
+                    <div class="flex flex-col border-l border-outline-variant/30 pl-4">
+                        <span class="text-[10px] font-bold text-on-surface-variant uppercase">Ends</span>
+                        <span class="text-sm font-semibold text-error" th:text="${auction.auctionEndTime}">--</span>
+                    </div>
+                </div>
+                <a th:href="@{'/buyer/auction/' + ${auction.id}}"
+                   class="gilded-gradient text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all">
+                    View Auction
+                </a>
+            </div>
+        </article>
+    </section>
+</main>
+</body>
+</html>

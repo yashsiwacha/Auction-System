@@ -1,0 +1,65 @@
+# Production configuration
+spring:
+  thymeleaf.cache: true
+  main.banner-mode: off
+  
+  # Production Database Configuration (Environment variables)
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/Auction_System?createDatabaseIfNotExist=true&useSSL=true&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.cj.jdbc.Driver}
+    
+  # JPA Configuration for Production
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: ${DATABASE_DIALECT:org.hibernate.dialect.MySQLDialect}
+    properties:
+      hibernate:
+        dialect: ${DATABASE_DIALECT:org.hibernate.dialect.MySQLDialect}
+        format_sql: false
+        jdbc:
+          time_zone: Asia/Kolkata
+
+# Server Configuration for Production
+server:
+  port: ${PORT:9090}
+  servlet:
+    session:
+      timeout: 30m
+  
+# Logging for Production
+logging:
+  level:
+    com.in: INFO
+    org.hibernate: WARN
+    org.springframework: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+auction:
+  bid:
+    minimum-increment: ${AUCTION_BID_MIN_INCREMENT:0.01}
+    max-scale: 2
+    rate-limit:
+      per-second: ${AUCTION_BID_RATE_LIMIT_PER_SECOND:40}
+
+infra:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topic:
+      bid-events: ${KAFKA_BID_TOPIC:auction-bid-events}
+  redis:
+    enabled: ${REDIS_ENABLED:false}
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout-ms: ${REDIS_TIMEOUT_MS:2000}
+
+stress:
+  max-total-requests: ${STRESS_MAX_TOTAL_REQUESTS:20000}
+  max-concurrency: ${STRESS_MAX_CONCURRENCY:256}
+  job-timeout-seconds: ${STRESS_JOB_TIMEOUT_SECONDS:900}

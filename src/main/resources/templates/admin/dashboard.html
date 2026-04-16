@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Dashboard | The Digital Curator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 6% -10%, #dbeafe 0%, #dbeafe00 38%),
+                radial-gradient(circle at 94% -10%, #e9d5ff 0%, #e9d5ff00 34%),
+                #f8f9ff;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-enter {
+            animation: pageIn 280ms ease-out;
+        }
+    </style>
+</head>
+<body class="font-body text-slate-900 overflow-x-hidden">
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-8">
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
+        <nav class="hidden md:flex gap-6 items-center">
+            <a class="font-headline tracking-tight text-blue-900 border-b-2 border-blue-900 pb-1" href="/admin/dashboard">Dashboard</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/admin/products">Products</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/admin/users">Users</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/admin/slots">Auction Slots</a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="hidden sm:inline text-sm text-slate-700" th:text="${user.fullName}">Admin</span>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/logout">
+            <span class="material-symbols-outlined text-slate-600">logout</span>
+        </a>
+    </div>
+</header>
+
+<main class="pt-24 p-6 page-enter">
+    <div class="max-w-[1300px] mx-auto">
+        <div th:if="${success != null or error != null}" class="mb-6">
+            <div th:if="${success}" class="rounded-xl bg-green-100 text-green-800 px-4 py-3 text-sm" th:text="${success}"></div>
+            <div th:if="${error}" class="rounded-xl bg-red-100 text-red-800 px-4 py-3 text-sm" th:text="${error}"></div>
+        </div>
+
+        <div class="mb-8">
+            <h1 class="font-headline text-4xl font-bold tracking-tight text-primary mb-2">Admin Command Dashboard</h1>
+            <p class="text-outline text-sm">Monitor system health, approve seller listings, and orchestrate auction operations.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+                <p class="text-[11px] uppercase tracking-wider text-outline">Total Users</p>
+                <p class="text-3xl font-headline font-bold text-primary" th:text="${#lists.size(allUsers)}">0</p>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+                <p class="text-[11px] uppercase tracking-wider text-outline">Products</p>
+                <p class="text-3xl font-headline font-bold text-primary" th:text="${#lists.size(allProducts)}">0</p>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+                <p class="text-[11px] uppercase tracking-wider text-outline">Pending</p>
+                <p class="text-3xl font-headline font-bold text-amber-700" th:text="${#lists.size(pendingProducts)}">0</p>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+                <p class="text-[11px] uppercase tracking-wider text-outline">Active Auctions</p>
+                <p class="text-3xl font-headline font-bold text-green-700" th:text="${#lists.size(allProducts)}">0</p>
+            </div>
+        </div>
+
+        <section class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-6" th:if="${!#lists.isEmpty(pendingProducts)}">
+            <h2 class="font-headline text-2xl text-primary mb-4">Pending Product Approvals</h2>
+            <div class="space-y-3">
+                <article th:each="product : ${pendingProducts}" class="border border-slate-200 rounded-xl p-4 hover:shadow-sm transition-shadow">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                        <div class="md:col-span-4">
+                            <h3 class="font-headline text-lg font-bold text-primary" th:text="${product.title}">Title</h3>
+                            <p class="text-xs text-outline" th:text="${product.description}">Description</p>
+                        </div>
+                        <div class="md:col-span-2 text-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Seller</p>
+                            <p class="font-semibold text-primary" th:text="${product.seller.fullName}">Seller</p>
+                        </div>
+                        <div class="md:col-span-2 text-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Starting</p>
+                            <p class="font-semibold text-primary" th:text="'â‚¹' + ${product.startingPrice}">â‚¹0</p>
+                        </div>
+                        <div class="md:col-span-2 text-xs text-outline" th:text="${product.auctionStartTime} + ' to ' + ${product.auctionEndTime}">Period</div>
+                        <div class="md:col-span-2 flex gap-2 justify-end">
+                            <form method="post" th:action="@{'/admin/product/approve/' + ${product.id}}">
+                                <button type="submit" class="px-3 py-2 rounded-lg bg-green-700 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-shadow">Approve</button>
+                            </form>
+                            <form method="post" th:action="@{'/admin/product/reject/' + ${product.id}}">
+                                <button type="submit" class="px-3 py-2 rounded-lg bg-red-700 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-shadow">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5">
+                <h3 class="font-headline text-xl text-primary mb-3">Quick Actions</h3>
+                <div class="flex flex-wrap gap-2">
+                    <a class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-blue-700 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all" href="/admin/products">Manage Products</a>
+                    <a class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold" href="/admin/users">Manage Users</a>
+                    <a class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold" href="/admin/slots">Slots</a>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-slate-200">
+                    <h4 class="font-headline text-lg text-primary mb-3">Stress Test</h4>
+                    <form action="/admin/stress-test" method="post" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-outline mb-1" for="auctionId">Active Auction</label>
+                            <select id="auctionId" name="auctionId" required="required" class="w-full rounded-lg border-slate-300 text-sm">
+                                <option value="">Select auction</option>
+                                <option th:each="auction : ${activeAuctions}"
+                                        th:value="${auction.id}"
+                                        th:text="${auction.id} + ' - ' + ${auction.title}">Auction</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-outline mb-1" for="totalRequests">Total Bid Requests</label>
+                            <input id="totalRequests" name="totalRequests" type="number" min="1" max="20000" value="10000" class="w-full rounded-lg border-slate-300 text-sm"/>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-outline mb-1" for="concurrency">Concurrency</label>
+                            <input id="concurrency" name="concurrency" type="number" min="1" max="256" value="100" class="w-full rounded-lg border-slate-300 text-sm"/>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <button type="submit" class="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all">Run Stress Test</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-5">
+                <h3 class="font-headline text-xl text-primary mb-3">System Status</h3>
+                <p class="text-sm mb-1"><strong>System:</strong> Operational</p>
+                <p class="text-sm mb-1"><strong>Database:</strong> Connected</p>
+                <p class="text-sm"><strong>Last Updated:</strong> <span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm')}"></span></p>
+
+                <div class="mt-5 pt-4 border-t border-slate-200">
+                    <h4 class="font-headline text-lg text-primary mb-3">Recent Stress Jobs</h4>
+                    <div th:if="${#lists.isEmpty(recentStressJobs)}" class="text-xs text-outline">No stress-test jobs started yet.</div>
+                    <div th:if="${!#lists.isEmpty(recentStressJobs)}" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        <article th:each="job : ${recentStressJobs}" class="border border-slate-200 rounded-lg p-3 text-xs">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-primary" th:text="'Job ' + ${job.jobId}">Job ID</span>
+                                <span class="px-2 py-0.5 rounded-full font-semibold"
+                                      th:classappend="${job.status == 'COMPLETED'} ? ' bg-emerald-100 text-emerald-700' : (${job.status == 'RUNNING'} ? ' bg-amber-100 text-amber-700' : ' bg-rose-100 text-rose-700')"
+                                      th:text="${job.status}">RUNNING</span>
+                            </div>
+                            <p class="mt-1 text-outline" th:text="'Auction #' + ${job.auctionId} + ' | Requests: ' + ${job.totalRequests} + ' | Concurrency: ' + ${job.concurrency}">Meta</p>
+                            <p class="mt-1 text-slate-700" th:text="'Success: ' + ${job.successCount} + ' | Failures: ' + ${job.failureCount}">Counts</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
+
+

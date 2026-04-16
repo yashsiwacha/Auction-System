@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Product | The Digital Curator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f8ff;
+            --panel: #ffffff;
+            --line: #d7e1f3;
+        }
+        body {
+            font-family: Inter, sans-serif;
+            background:
+                radial-gradient(circle at 3% -10%, #dbeafe 0%, #dbeafe00 42%),
+                radial-gradient(circle at 96% 3%, #ecfccb 0%, #ecfccb00 32%),
+                var(--bg);
+        }
+        .font-display { font-family: "Space Grotesk", sans-serif; }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900">
+    <header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <a href="/seller/dashboard" class="font-display text-lg font-bold tracking-tight">The Digital Curator</a>
+            <nav class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+                <a href="/seller/dashboard" class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100">Dashboard</a>
+                <a href="/seller/products" class="rounded-full bg-blue-100 px-3 py-1.5 text-blue-700">Products</a>
+                <a href="/logout" class="rounded-full px-3 py-1.5 text-rose-600 hover:bg-rose-50">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <section th:if="${success != null or error != null}" class="mb-6 space-y-3">
+            <div th:if="${success}" class="panel border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" th:text="${success}"></div>
+            <div th:if="${error}" class="panel border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" th:text="${error}"></div>
+        </section>
+
+        <section class="mb-6 panel border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
+            Product editing is currently disabled in the backend. This screen is kept ready for future re-enable.
+        </section>
+
+        <section class="panel p-6 sm:p-8" th:if="${product != null}">
+            <h1 class="font-display text-3xl font-bold tracking-tight">Edit Product</h1>
+            <p class="mt-1 text-sm text-slate-600">Update listing details while respecting auction constraints.</p>
+
+            <form class="mt-8 grid gap-5" method="post" th:action="@{'/seller/product/edit/' + ${product.id}}">
+                <div>
+                    <label for="title" class="mb-1 block text-sm font-semibold text-slate-700">Title</label>
+                    <input id="title" name="title" type="text" required="required" th:value="${product.title}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                </div>
+
+                <div>
+                    <label for="description" class="mb-1 block text-sm font-semibold text-slate-700">Description</label>
+                    <textarea id="description" name="description" rows="4" required="required" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" th:text="${product.description}"></textarea>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="startingPrice" class="mb-1 block text-sm font-semibold text-slate-700">Starting Price (Rs)</label>
+                        <input id="startingPrice" name="startingPrice" type="number" min="0.01" step="0.01" required="required" th:value="${product.startingPrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                    <div>
+                        <label for="reservePrice" class="mb-1 block text-sm font-semibold text-slate-700">Reserve Price</label>
+                        <input id="reservePrice" name="reservePrice" type="number" min="0.01" step="0.01" th:value="${product.reservePrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="auctionStartTime" class="mb-1 block text-sm font-semibold text-slate-700">Auction Start</label>
+                        <input id="auctionStartTime" name="auctionStartTime" type="datetime-local" required="required" th:value="${product.auctionStartTime != null ? #temporals.format(product.auctionStartTime, 'yyyy-MM-dd''T''HH:mm') : ''}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                    <div>
+                        <label for="auctionEndTime" class="mb-1 block text-sm font-semibold text-slate-700">Auction End</label>
+                        <input id="auctionEndTime" name="auctionEndTime" type="datetime-local" required="required" th:value="${product.auctionEndTime != null ? #temporals.format(product.auctionEndTime, 'yyyy-MM-dd''T''HH:mm') : ''}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="imageUrl" class="mb-1 block text-sm font-semibold text-slate-700">Image URL</label>
+                    <input id="imageUrl" name="imageUrl" type="url" th:value="${product.imageUrl}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" />
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    Current status: <span class="font-semibold" th:text="${product.status}">PENDING</span>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-1">
+                    <a href="/seller/products" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Back</a>
+                    <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Save Changes</button>
+                </div>
+            </form>
+        </section>
+
+        <section th:if="${product == null}" class="panel px-6 py-8 text-center">
+            <p class="text-lg font-semibold text-slate-800">Product data unavailable</p>
+            <a href="/seller/products" class="mt-4 inline-flex rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Return to Products</a>
+        </section>
+    </main>
+</body>
+</html>
+

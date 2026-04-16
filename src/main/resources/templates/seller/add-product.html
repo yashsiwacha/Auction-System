@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product | The Digital Curator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f3f7ff;
+            --panel: #ffffff;
+            --line: #d8e1f2;
+        }
+        body {
+            font-family: Inter, sans-serif;
+            background:
+                radial-gradient(circle at 0% -12%, #dbeafe 0%, #dbeafe00 40%),
+                radial-gradient(circle at 100% 0%, #dcfce7 0%, #dcfce700 36%),
+                var(--bg);
+        }
+        .font-display { font-family: "Space Grotesk", sans-serif; }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900">
+    <header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <a href="/seller/dashboard" class="font-display text-lg font-bold tracking-tight">The Digital Curator</a>
+            <nav class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+                <a href="/seller/dashboard" class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100">Dashboard</a>
+                <a href="/seller/products" class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100">Products</a>
+                <a href="/seller/product/add" class="rounded-full bg-blue-100 px-3 py-1.5 text-blue-700">Add Product</a>
+                <a href="/logout" class="rounded-full px-3 py-1.5 text-rose-600 hover:bg-rose-50">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <section th:if="${success != null or error != null}" class="mb-6 space-y-3">
+            <div th:if="${success}" class="panel border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" th:text="${success}"></div>
+            <div th:if="${error}" class="panel border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800" th:text="${error}"></div>
+        </section>
+
+        <section class="panel p-6 sm:p-8">
+            <h1 class="font-display text-3xl font-bold tracking-tight">Create Product Listing</h1>
+            <p class="mt-1 text-sm text-slate-600">New listings go through admin review before auction activation.</p>
+
+            <form method="post" action="/seller/product/add" class="mt-8 grid gap-5">
+                <div>
+                    <label for="title" class="mb-1 block text-sm font-semibold text-slate-700">Product Title</label>
+                    <input id="title" name="title" type="text" required="required" th:value="${title}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" placeholder="Ex: Apple Watch Series 9" />
+                </div>
+
+                <div>
+                    <label for="description" class="mb-1 block text-sm font-semibold text-slate-700">Description</label>
+                    <textarea id="description" name="description" required="required" rows="4" th:text="${description}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" placeholder="Condition, specs, accessories, and any defects"></textarea>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="startingPrice" class="mb-1 block text-sm font-semibold text-slate-700">Starting Price (Rs)</label>
+                        <input id="startingPrice" name="startingPrice" type="number" min="0.01" step="0.01" required="required" th:value="${startingPrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" placeholder="1000" />
+                    </div>
+                    <div>
+                        <label for="reservePrice" class="mb-1 block text-sm font-semibold text-slate-700">Reserve Price (Optional)</label>
+                        <input id="reservePrice" name="reservePrice" type="number" min="0" step="0.01" th:value="${reservePrice}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" placeholder="1500" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="auctionSlotId" class="mb-1 block text-sm font-semibold text-slate-700">Auction Time Slot</label>
+                    <select id="auctionSlotId" name="auctionSlotId" required="required" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring">
+                        <option value="">Select a slot</option>
+                        <option th:each="slot : ${availableSlots}" th:value="${slot.id}" th:text="${slot.slotDate} + ' | ' + ${slot.timeRange} + ' | Capacity: ' + ${slot.currentProducts} + '/' + ${slot.maxProducts}"></option>
+                    </select>
+                    <p class="mt-1 text-xs text-slate-500">Slots are generated by day. Pick one with available capacity.</p>
+                </div>
+
+                <div>
+                    <label for="imageUrl" class="mb-1 block text-sm font-semibold text-slate-700">Image URL (Optional)</label>
+                    <input id="imageUrl" name="imageUrl" type="url" th:value="${imageUrl}" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none ring-blue-200 transition focus:border-blue-500 focus:ring" placeholder="https://..." />
+                </div>
+
+                <div class="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                    This product remains hidden until admin approval is completed.
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+                    <a href="/seller/products" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Cancel</a>
+                    <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Submit Product</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
+

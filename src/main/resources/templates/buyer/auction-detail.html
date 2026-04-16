@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title th:text="${product.title} + ' | The Digital Curator'">The Digital Curator | Live Auction Room</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary-container": "#fe9d00",
+                        "on-secondary-container": "#653c00",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
+                radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
+                #f8f9ff;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-enter {
+            animation: pageIn 280ms ease-out;
+        }
+    </style>
+</head>
+<body class="font-body text-slate-900 overflow-x-hidden">
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-8">
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
+        <nav class="hidden md:flex gap-6">
+            <a class="text-slate-500 font-headline tracking-tight hover:text-blue-700 transition-colors" href="/buyer/dashboard">Dashboard</a>
+            <a class="text-blue-900 border-b-2 border-blue-900 pb-1 font-headline tracking-tight" href="/buyer/auctions">Auctions</a>
+            <a class="text-slate-500 font-headline tracking-tight hover:text-blue-700 transition-colors" href="/buyer/my-bids">History</a>
+            <a class="text-slate-500 font-headline tracking-tight hover:text-blue-700 transition-colors" href="/buyer/search">Search</a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="hidden sm:flex flex-col items-end mr-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-outline">Signed in as</span>
+            <span class="text-blue-900 font-headline font-bold" th:text="${user.fullName}">Buyer</span>
+        </div>
+        <a class="p-2 hover:bg-slate-50 rounded-full transition-colors" href="/buyer/my-bids">
+            <span class="material-symbols-outlined text-slate-600">notifications</span>
+        </a>
+        <a class="p-2 hover:bg-slate-50 rounded-full transition-colors" href="/logout">
+            <span class="material-symbols-outlined text-slate-600">logout</span>
+        </a>
+    </div>
+</header>
+
+<aside class="hidden lg:flex flex-col fixed left-0 top-16 h-[calc(100vh-4rem)] p-4 w-64 bg-slate-50 z-40">
+    <div class="mb-8 px-2 flex items-center gap-3">
+        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+        <div>
+            <p class="text-sm font-bold text-blue-900 uppercase tracking-tighter">Command Center</p>
+            <p class="text-[10px] text-slate-500 uppercase">System Active</p>
+        </div>
+    </div>
+    <div class="flex-1 space-y-2">
+        <a class="flex items-center gap-3 px-4 py-3 bg-blue-100/50 text-blue-900 rounded-lg transition-transform hover:translate-x-1" href="/buyer/auctions">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+            <span class="font-medium text-sm">Live Auctions</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-lg transition-transform hover:translate-x-1" href="/buyer/my-bids">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-medium text-sm">My Bids</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-lg transition-transform hover:translate-x-1" href="/buyer/search">
+            <span class="material-symbols-outlined">visibility</span>
+            <span class="font-medium text-sm">Watchlist</span>
+        </a>
+    </div>
+    <div class="mt-auto pt-6 border-t border-slate-200">
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-lg transition-transform hover:translate-x-1" href="/buyer/dashboard">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-medium text-sm">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-lg transition-transform hover:translate-x-1" href="/logout">
+            <span class="material-symbols-outlined text-error">logout</span>
+            <span class="font-medium text-sm text-error">Log Out</span>
+        </a>
+    </div>
+</aside>
+
+<main class="lg:ml-64 mt-16 p-4 md:p-8 min-h-[calc(100vh-4rem)] page-enter">
+    <div class="mb-6" th:if="${success != null or error != null}">
+        <div th:if="${success}" class="bg-green-100 text-green-800 px-4 py-3 rounded-lg text-sm" th:text="${success}"></div>
+        <div th:if="${error}" class="bg-red-100 text-red-800 px-4 py-3 rounded-lg text-sm" th:text="${error}"></div>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase flex items-center gap-2" th:if="${canBid}">
+                    <span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></span>
+                    Live Auction
+                </span>
+                <span class="bg-surface-container-high text-slate-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase" th:if="${!canBid}">Bidding Closed</span>
+                <span class="text-outline text-xs font-medium" th:text="'ID: #' + ${product.id}">ID</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold font-headline tracking-tighter text-primary" th:text="${product.title}">Auction Item</h1>
+        </div>
+
+        <div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl">
+            <div class="relative w-16 h-16 flex items-center justify-center">
+                <svg class="absolute inset-0 w-full h-full -rotate-90">
+                    <circle class="text-slate-300" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+                    <circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175" stroke-dashoffset="40" stroke-width="4"></circle>
+                </svg>
+                <span class="text-xs font-bold font-headline">LIVE</span>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold text-outline uppercase tracking-widest leading-none mb-1">Auction End</p>
+                <p class="text-sm md:text-base font-headline font-bold text-primary" th:text="${product.auctionEndTime}">Time</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 space-y-6">
+            <section class="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row">
+                <div class="md:w-1/2 h-64 md:h-auto relative bg-surface-container-high">
+                    <img th:if="${product.imageUrl != null and product.imageUrl != ''}" th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-full object-cover"/>
+                    <div th:if="${product.imageUrl == null or product.imageUrl == ''}" class="w-full h-full flex items-center justify-center text-outline">
+                        <span class="material-symbols-outlined text-6xl">image</span>
+                    </div>
+                    <div class="absolute top-4 left-4 flex gap-2">
+                        <div class="bg-white/80 px-3 py-1 rounded-lg text-primary text-[10px] font-bold uppercase backdrop-blur-md">Active Listing</div>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 p-8 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-outline uppercase tracking-widest mb-2">Current Highest Bid</p>
+                        <h2 class="text-5xl md:text-6xl font-bold font-headline text-primary mb-1" th:text="'â‚¹' + ${product.currentHighestBid}">â‚¹0</h2>
+                        <div class="flex items-center gap-2 text-secondary font-medium text-sm">
+                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+                            <span th:text="'Minimum next: â‚¹' + ${minimumBid}">Minimum next</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 space-y-4" th:if="${canBid}">
+                        <form method="post" th:action="@{'/buyer/auction/' + ${product.id} + '/bid'}" class="space-y-4">
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline font-headline font-bold text-lg">â‚¹</span>
+                                <input class="w-full pl-8 pr-4 py-4 bg-surface-container-low border-none rounded-lg font-headline text-xl font-bold focus:ring-2 focus:ring-blue-300 text-primary"
+                                       type="number" name="bidAmount" step="0.01" required="required" th:min="${minimumBid}" th:value="${minimumBid}"/>
+                            </div>
+                            <button class="w-full py-4 bg-gradient-to-r from-primary to-blue-700 text-white font-headline font-bold text-lg rounded-lg shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2" type="submit">
+                                <span class="material-symbols-outlined">gavel</span>
+                                Place Bid
+                            </button>
+                        </form>
+                        <p class="text-[10px] text-center text-outline uppercase tracking-tighter">Atomic bidding enabled with optimistic locking and rollback safety.</p>
+                    </div>
+
+                    <div class="mt-8" th:if="${!canBid}">
+                        <div class="bg-surface-container-low rounded-lg p-4 text-sm text-slate-700">
+                            This auction is not accepting new bids right now. Review final outcomes in the live stream panel.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-secondary-container/30 p-4 rounded-xl flex items-start gap-4">
+                    <div class="bg-secondary rounded-full p-2">
+                        <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    </div>
+                    <div>
+                        <p class="text-on-secondary-container font-bold text-sm">Transaction Safe</p>
+                        <p class="text-on-secondary-container/80 text-xs">Highest bid updates are serialized by database-level consistency checks.</p>
+                    </div>
+                </div>
+
+                <div class="bg-error-container/50 p-4 rounded-xl border border-red-300/30 flex items-start gap-4">
+                    <div class="bg-error rounded-full p-2">
+                        <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    </div>
+                    <div>
+                        <p class="text-on-error-container font-bold text-sm">Race-Protected</p>
+                        <p class="text-on-error-container/80 text-xs">Competing bids that lose race conditions are rejected with deterministic status updates.</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="bg-surface-container-low p-6 rounded-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">description</span>
+                        Product Description
+                    </h3>
+                    <span class="text-[10px] font-bold text-secondary bg-white px-2 py-1 rounded" th:text="${product.status}">STATUS</span>
+                </div>
+                <p class="text-sm leading-relaxed text-slate-700" th:text="${product.description}">Description</p>
+            </section>
+        </div>
+
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-primary text-white p-6 rounded-xl shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-[10px] font-bold" th:text="${#lists.size(bids)}">0</div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Live Traffic</span>
+                    </div>
+                    <p class="text-4xl font-headline font-bold mb-1" th:text="${#lists.size(bids)}">0</p>
+                    <p class="text-xs text-blue-200">Total bids recorded for this auction.</p>
+                </div>
+                <div class="absolute -right-8 -bottom-8 opacity-10">
+                    <span class="material-symbols-outlined text-[160px]">diversity_3</span>
+                </div>
+            </div>
+
+            <section class="bg-surface-container rounded-xl flex flex-col h-[600px]">
+                <div class="p-4 border-b border-slate-300/30 flex justify-between items-center bg-surface-container-highest rounded-t-xl">
+                    <h3 class="text-xs font-bold uppercase tracking-widest">Live Bid Stream</h3>
+                    <span class="text-[10px] text-outline font-mono" th:text="'Version: ' + (${product.version != null ? product.version : 0})">Version</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar" th:if="${!#lists.isEmpty(bids)}">
+                    <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-300/20" th:each="bid : ${bids}">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-bold text-primary" th:text="${bid.bidder.fullName}">Bidder</span>
+                            <span class="text-[10px] font-mono text-outline" th:text="${bid.bidTime}">Time</span>
+                        </div>
+                        <p class="text-sm font-headline font-bold text-secondary" th:text="'â‚¹' + ${bid.bidAmount}">â‚¹0</p>
+                        <div class="mt-2">
+                            <span class="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-green-100 text-green-800" th:if="${bid.status.name() == 'WINNING'}">Winning</span>
+                            <span class="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-yellow-100 text-yellow-800" th:if="${bid.status.name() == 'OUTBID'}">Outbid</span>
+                            <span class="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-800" th:if="${bid.status.name() == 'WON'}">Won</span>
+                            <span class="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-slate-100 text-slate-700" th:if="${bid.status.name() != 'WINNING' and bid.status.name() != 'OUTBID' and bid.status.name() != 'WON'}" th:text="${bid.status}">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-6 flex items-center justify-center" th:if="${#lists.isEmpty(bids)}">
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-5xl text-slate-400">hourglass_empty</span>
+                        <p class="mt-2 text-sm text-outline">No bids yet. Be the first to place one.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-surface-container-high rounded-b-xl">
+                    <a class="w-full text-xs font-bold text-outline hover:text-primary transition-colors py-1 block text-center" href="/buyer/my-bids">View Full History</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer class="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-slate-300/30 pt-6">
+        <div class="flex items-center gap-6 text-outline text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-0">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-secondary rounded-full"></span>
+                Global Node: IN-BUYER-01
+            </div>
+            <div class="flex items-center gap-2">
+                Protocol: Auction Engine v4.2
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-outline text-lg">verified_user</span>
+            <span class="text-[10px] font-bold text-outline uppercase">Conflict-safe transaction room</span>
+        </div>
+    </footer>
+</main>
+
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-100 flex justify-around items-center z-50">
+    <a class="flex flex-col items-center gap-1 text-blue-900" href="/buyer/auction/1" th:href="@{'/buyer/auction/' + ${product.id}}">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+        <span class="text-[10px] font-bold uppercase">Auction</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/my-bids">
+        <span class="material-symbols-outlined">payments</span>
+        <span class="text-[10px] font-bold uppercase">Bids</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/auctions">
+        <span class="material-symbols-outlined">analytics</span>
+        <span class="text-[10px] font-bold uppercase">Stats</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/dashboard">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-bold uppercase">Profile</span>
+    </a>
+</nav>
+</body>
+</html>
+
+

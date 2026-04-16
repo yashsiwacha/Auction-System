@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: auction-system
+    runtime: docker
+    plan: free
+    healthCheckPath: /login
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,postgres
+      - key: DB_HOST
+        fromDatabase:
+          name: auction-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: auction-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: auction-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: auction-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: auction-db
+          property: password
+      - key: DB_SSL_MODE
+        value: disable
+
+databases:
+  - name: auction-db
+    databaseName: auction_system
+    user: auction_user

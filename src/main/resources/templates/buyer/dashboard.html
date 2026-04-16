@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Buyer Dashboard | The Digital Curator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary-container": "#fe9d00",
+                        "on-secondary-container": "#653c00",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
+                radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
+                #f8f9ff;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #885200;
+            box-shadow: 0 0 0 rgba(0, 109, 67, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 109, 67, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 109, 67, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 109, 67, 0); }
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .page-enter {
+            animation: pageIn 280ms ease-out;
+        }
+    </style>
+</head>
+<body class="font-body text-slate-900 overflow-x-hidden">
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-8">
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
+        <nav class="hidden md:flex gap-6 items-center">
+            <a class="font-headline tracking-tight text-blue-900 border-b-2 border-blue-900 pb-1" href="/buyer/dashboard">Dashboard</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/buyer/auctions">Auctions</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/buyer/my-bids">History</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/buyer/search">Search</a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="hidden sm:inline text-blue-900 font-medium" th:text="'Hi, ' + ${user.fullName}">Hi, Buyer</span>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/buyer/my-bids">
+            <span class="material-symbols-outlined text-slate-600">notifications</span>
+        </a>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/buyer/auctions">
+            <span class="material-symbols-outlined text-slate-600">wifi_tethering</span>
+        </a>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/logout">
+            <span class="material-symbols-outlined text-slate-600">logout</span>
+        </a>
+    </div>
+</header>
+
+<aside class="hidden lg:flex flex-col fixed left-0 top-16 h-[calc(100vh-4rem)] p-4 w-64 bg-slate-50 text-sm font-medium">
+    <div class="mb-8 p-4 bg-blue-100/30 rounded-xl">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center font-bold" th:text="${#strings.substring(user.fullName,0,1)}">B</div>
+            <div>
+                <h3 class="text-blue-900 font-bold">Command Center</h3>
+                <p class="text-xs text-secondary flex items-center gap-1"><span class="pulse-dot"></span> System Active</p>
+            </div>
+        </div>
+        <a class="w-full mt-4 inline-block text-center bg-gradient-to-r from-primary to-blue-700 text-white py-2 rounded-lg text-xs font-bold active:opacity-80 transition-opacity" href="/buyer/auctions">
+            Place Quick Bid
+        </a>
+    </div>
+
+    <nav class="flex-grow space-y-1">
+        <a class="flex items-center gap-3 px-4 py-3 bg-blue-100/50 text-blue-900 rounded-lg hover:translate-x-1 transition-transform" href="/buyer/auctions">
+            <span class="material-symbols-outlined">gavel</span> Live Auctions
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 hover:translate-x-1 transition-transform" href="/buyer/my-bids">
+            <span class="material-symbols-outlined">payments</span> My Bids
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 hover:translate-x-1 transition-transform" href="/buyer/search">
+            <span class="material-symbols-outlined">visibility</span> Discover
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 hover:translate-x-1 transition-transform" href="/buyer/dashboard">
+            <span class="material-symbols-outlined">analytics</span> Analytics
+        </a>
+    </nav>
+
+    <div class="mt-auto pt-4 space-y-1">
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 hover:translate-x-1 transition-transform" href="/buyer/search">
+            <span class="material-symbols-outlined">settings</span> Settings
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-100 hover:translate-x-1 transition-transform" href="/logout">
+            <span class="material-symbols-outlined">logout</span> Log Out
+        </a>
+    </div>
+</aside>
+
+<main class="lg:ml-64 pt-20 p-6 page-enter">
+    <div class="max-w-[1400px] mx-auto">
+        <div th:if="${success != null or error != null}" class="mb-6">
+            <div th:if="${success}" class="rounded-xl bg-green-100 text-green-800 px-4 py-3 text-sm" th:text="${success}"></div>
+            <div th:if="${error}" class="rounded-xl bg-red-100 text-red-800 px-4 py-3 text-sm" th:text="${error}"></div>
+        </div>
+
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+            <div>
+                <h1 class="font-headline text-4xl font-bold tracking-tight text-primary mb-2">Auction Dashboard</h1>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1 bg-secondary-container rounded-full">
+                        <span class="pulse-dot"></span>
+                        <span class="text-[10px] font-bold text-on-secondary-container tracking-wider uppercase">Live Feed Active</span>
+                    </div>
+                    <span class="text-sm text-outline font-medium">Buyer mode is synchronized with latest bids.</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4 w-full md:w-auto">
+                <div class="bg-white border border-slate-200 shadow-sm px-4 py-3 rounded-xl flex-1 md:flex-none min-w-[120px]">
+                    <span class="block text-[10px] font-bold text-outline uppercase mb-1">Active Auctions</span>
+                    <span class="font-headline text-xl font-bold text-primary" th:text="${#lists.size(activeAuctions)}">0</span>
+                </div>
+                <div class="bg-white border border-slate-200 shadow-sm px-4 py-3 rounded-xl flex-1 md:flex-none min-w-[120px]">
+                    <span class="block text-[10px] font-bold text-outline uppercase mb-1">Total Bids</span>
+                    <span class="font-headline text-xl font-bold text-primary" th:text="${#lists.size(userBids)}">0</span>
+                </div>
+                <div class="bg-primary shadow-sm px-4 py-3 rounded-xl flex-1 md:flex-none min-w-[120px]">
+                    <span class="block text-[10px] font-bold text-blue-200 mb-1 uppercase">Winning</span>
+                    <span class="font-headline text-xl font-bold text-white" th:text="${winningBidsCount ?: 0}">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+            <div class="xl:col-span-9 space-y-6">
+                <div class="flex justify-between items-center px-2">
+                    <h2 class="font-headline text-xl font-bold">Active Auctions</h2>
+                    <div class="flex gap-2">
+                        <a class="px-4 py-1.5 text-xs font-bold rounded-lg bg-surface-container-highest text-primary" href="/buyer/auctions">All Items</a>
+                        <a class="px-4 py-1.5 text-xs font-bold rounded-lg text-outline hover:bg-surface-container-low" href="/buyer/search">Search</a>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(activeAuctions)}" class="bg-surface-container-low rounded-xl p-10 text-center">
+                    <p class="text-lg font-headline text-primary mb-2">No active auctions right now</p>
+                    <p class="text-sm text-outline mb-4">Check back soon or explore searchable inventory.</p>
+                    <a class="inline-block bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold" href="/buyer/search">Explore Inventory</a>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(activeAuctions)}" class="space-y-4">
+                    <div th:each="auction : ${activeAuctions}" class="group bg-white border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-xl p-4 transition-all duration-300 flex flex-col md:flex-row items-center gap-6">
+                        <div class="relative w-full md:w-48 h-32 overflow-hidden rounded-lg bg-surface-container-high">
+                            <img th:if="${auction.imageUrl != null and auction.imageUrl != ''}" th:src="${auction.imageUrl}" th:alt="${auction.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                            <div th:if="${auction.imageUrl == null or auction.imageUrl == ''}" class="w-full h-full flex items-center justify-center text-outline">
+                                <span class="material-symbols-outlined text-4xl">image</span>
+                            </div>
+                            <div class="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 text-white text-[9px] font-bold rounded-sm backdrop-blur-sm">LIVE</div>
+                        </div>
+
+                        <div class="flex-grow grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+                            <div class="md:col-span-1">
+                                <h3 class="font-headline text-lg font-bold leading-tight text-primary mb-1" th:text="${auction.title}">Auction Item</h3>
+                                <span class="text-[10px] text-outline uppercase tracking-widest" th:text="'ID: #' + ${auction.id}">ID</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-[10px] text-outline uppercase mb-1">Current Bid</span>
+                                <span class="font-headline text-2xl font-bold text-primary" th:text="'â‚¹' + ${auction.currentHighestBid}">â‚¹0</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-[10px] text-outline uppercase mb-1">Ends</span>
+                                <span class="font-headline text-base font-bold text-error tracking-tight" th:text="${auction.auctionEndTime}">Soon</span>
+                            </div>
+                            <div class="flex items-center justify-between md:justify-center gap-4">
+                                <a th:href="@{'/buyer/auction/' + ${auction.id}}" class="bg-gradient-to-br from-primary to-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:shadow-lg active:scale-95 transition-all">
+                                    Join Auction
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="xl:col-span-3 space-y-6">
+                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="material-symbols-outlined text-green-300" style="font-variation-settings: 'FILL' 1;">analytics</span>
+                        <h3 class="font-headline text-sm font-bold uppercase tracking-widest">System Insights</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-tighter">Your Winning Bids</span>
+                            <div class="flex items-end gap-2">
+                                <span class="font-headline text-3xl font-bold text-green-300 tracking-tight" th:text="${winningBidsCount ?: 0}">0</span>
+                            </div>
+                            <div class="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
+                                <div class="h-full bg-green-300" th:style="'width:' + (${#lists.size(userBids) == 0 ? 0 : (winningBidsCount * 100 / #lists.size(userBids))}) + '%'" style="width:0%"></div>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-white/10">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase">Bid Volume</span>
+                                <span class="text-[10px] font-bold text-green-300">TRACKED</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">Your account activity and live auctions are synchronized with conflict-safe bidding APIs.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 shadow-sm p-6 rounded-xl">
+                    <h3 class="font-headline text-sm font-bold text-primary mb-4 uppercase tracking-widest">Live Activity</h3>
+                    <div class="space-y-4 max-h-[420px] overflow-y-auto no-scrollbar" th:if="${!#lists.isEmpty(userBids)}">
+                        <div class="flex gap-3" th:each="bid : ${userBids}">
+                            <div class="w-2 h-2 mt-1.5 rounded-full bg-secondary"></div>
+                            <div>
+                                <p class="text-xs font-medium text-primary" th:text="'Bid: â‚¹' + ${bid.bidAmount} + ' on ' + ${bid.product.title}">Bid event</p>
+                                <p class="text-[10px] text-outline" th:text="${bid.bidTime}">Time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(userBids)}" class="text-xs text-outline">No bid activity yet. Start with a quick auction join.</div>
+                    <a class="w-full mt-6 text-xs font-bold text-primary/60 hover:text-primary transition-colors py-2 border border-slate-300 rounded-lg block text-center" href="/buyer/my-bids">
+                        View Full Log
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur border-t border-slate-100 flex justify-around items-center z-50">
+    <a class="flex flex-col items-center gap-1 text-blue-900" href="/buyer/dashboard">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+        <span class="text-[10px] font-bold uppercase">Home</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/auctions">
+        <span class="material-symbols-outlined">gavel</span>
+        <span class="text-[10px] font-bold uppercase">Auctions</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/my-bids">
+        <span class="material-symbols-outlined">payments</span>
+        <span class="text-[10px] font-bold uppercase">Bids</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 text-slate-500" href="/buyer/search">
+        <span class="material-symbols-outlined">search</span>
+        <span class="text-[10px] font-bold uppercase">Search</span>
+    </a>
+</nav>
+</body>
+</html>
+
+

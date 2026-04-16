@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Search | The Digital Curator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
+                radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
+                #f8f9ff;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-enter {
+            animation: pageIn 280ms ease-out;
+        }
+    </style>
+</head>
+<body class="font-body text-slate-900 overflow-x-hidden">
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-8">
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
+        <nav class="hidden md:flex gap-6 items-center">
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/dashboard">Dashboard</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/auctions">Auctions</a>
+            <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/my-bids">History</a>
+            <a class="font-headline tracking-tight text-blue-900 border-b-2 border-blue-900 pb-1" href="/buyer/search">Search</a>
+        </nav>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="hidden sm:inline text-sm text-slate-700" th:text="${user.fullName}">Buyer</span>
+        <a class="p-2 rounded-lg hover:bg-slate-50 transition-colors" href="/logout">
+            <span class="material-symbols-outlined text-slate-600">logout</span>
+        </a>
+    </div>
+</header>
+
+<main class="pt-24 p-6 page-enter">
+    <div class="max-w-[1300px] mx-auto">
+        <div class="mb-8">
+            <h1 class="font-headline text-4xl font-bold tracking-tight text-primary mb-2">Search Marketplace</h1>
+            <p class="text-outline text-sm">Find items by title or description and jump directly into auction rooms.</p>
+        </div>
+
+        <section class="bg-white border border-slate-200 shadow-sm rounded-xl p-5 mb-6">
+            <form class="flex flex-col md:flex-row gap-3" method="get" th:action="@{/buyer/search}">
+                <div class="flex-1">
+                    <label class="text-xs uppercase tracking-wider text-outline font-semibold" for="query">Keyword</label>
+                    <input class="mt-1 w-full rounded-lg border-slate-300 bg-surface-container-low text-sm px-3 py-2 focus:ring-2 focus:ring-blue-300"
+                           id="query" name="query" th:value="${query}" placeholder="Try: watch, painting, vintage" type="text"/>
+                </div>
+                <div class="md:self-end flex gap-2">
+                    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-blue-700 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all" type="submit">
+                        <span class="material-symbols-outlined text-base">search</span>
+                        Search
+                    </button>
+                    <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" href="/buyer/search">
+                        <span class="material-symbols-outlined text-base">close</span>
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <section class="bg-surface-container-low rounded-xl p-4 mb-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h2 class="font-headline text-xl font-bold text-primary">Results</h2>
+                <span class="text-xs uppercase tracking-wider text-outline font-semibold" th:text="${searchResults != null ? #lists.size(searchResults) : 0} + ' items'">0 items</span>
+            </div>
+        </section>
+
+        <div th:if="${searchResults == null}" class="bg-white border border-slate-200 rounded-xl p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-slate-400">travel_explore</span>
+            <h3 class="font-headline text-2xl text-primary mt-3">Start with a keyword</h3>
+            <p class="text-outline mt-1">Type a keyword above and we will match title and description across approved auctions.</p>
+        </div>
+
+        <div th:if="${searchResults != null and #lists.isEmpty(searchResults)}" class="bg-white border border-slate-200 rounded-xl p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-slate-400">search_off</span>
+            <h3 class="font-headline text-2xl text-primary mt-3">No matches found</h3>
+            <p class="text-outline mt-1">Try broader terms or switch to full auction browsing.</p>
+            <a class="inline-block mt-4 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold" href="/buyer/auctions">Browse All Auctions</a>
+        </div>
+
+        <div th:if="${searchResults != null and !#lists.isEmpty(searchResults)}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <article th:each="product : ${searchResults}" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div class="h-48 bg-surface-container-high relative">
+                    <img th:if="${product.imageUrl != null and product.imageUrl != ''}" th:src="${product.imageUrl}" th:alt="${product.title}" class="w-full h-full object-cover"/>
+                    <div th:if="${product.imageUrl == null or product.imageUrl == ''}" class="w-full h-full flex items-center justify-center text-slate-500">
+                        <span class="material-symbols-outlined text-5xl">image</span>
+                    </div>
+                    <span class="absolute top-3 right-3 text-[10px] uppercase tracking-wider px-2 py-1 rounded bg-white/90 font-semibold"
+                          th:classappend="${product.status.name() == 'ACTIVE'} ? ' text-green-700' : ' text-slate-700'"
+                          th:text="${product.status}">ACTIVE</span>
+                </div>
+
+                <div class="p-4">
+                    <h3 class="font-headline text-xl font-bold text-primary line-clamp-1" th:text="${product.title}">Title</h3>
+                    <p class="text-sm text-slate-600 mt-1 line-clamp-2" th:text="${product.description}">Description</p>
+                    <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
+                        <div class="bg-surface-container-low rounded-lg px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Starting</p>
+                            <p class="font-semibold text-primary" th:text="'â‚¹' + ${product.startingPrice}">â‚¹0</p>
+                        </div>
+                        <div class="bg-surface-container-low rounded-lg px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wider text-outline">Current</p>
+                            <p class="font-semibold text-secondary" th:text="'â‚¹' + ${product.currentHighestBid}">â‚¹0</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-outline mt-3" th:text="'Ends: ' + ${product.auctionEndTime}">Ends: --</p>
+                    <a th:href="@{'/buyer/auction/' + ${product.id}}" class="mt-4 w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm hover:shadow-md transition-all">
+                        <span class="material-symbols-outlined text-base">visibility</span>
+                        Open Auction
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+
+
