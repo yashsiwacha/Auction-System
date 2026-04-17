@@ -1,269 +1,175 @@
 # Auction System
 
-A comprehensive auction system built with Spring Boot and MySQL, featuring three types of users: Admin, Seller, and Buyer.
+[![Java](https://img.shields.io/badge/Java-11-1f2937?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-1.1.8.RELEASE-166534?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Template Engine](https://img.shields.io/badge/Thymeleaf-Server%20Rendered-0f766e)](https://www.thymeleaf.org/)
+[![Database](https://img.shields.io/badge/Database-MySQL%20%7C%20PostgreSQL-1d4ed8)](https://www.mysql.com/)
+[![Deploy](https://img.shields.io/badge/Deploy-Render-4c1d95)](https://render.com/)
 
-## Features
+Role-based auction platform built with Spring Boot, Thymeleaf, and JPA. The app supports Admin, Seller, and Buyer workflows with scheduled auction processing and production deployment options.
 
-### Admin Features
-- Approve/reject products for auction
-- Manage users (activate/deactivate)
-- Monitor system statistics
-- View all auctions and bids
+## Quick Navigation
 
-### Seller Features
-- Add products for auction
-- Set starting prices and reserve prices
-- Schedule auction start and end times
-- Track product status and bids
+- [Feature Overview](#feature-overview)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Local Setup](#local-setup)
+- [Deployment on Render](#deployment-on-render)
+- [Default Accounts](#default-accounts)
+- [Routes at a Glance](#routes-at-a-glance)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
 
-### Buyer Features
-- Browse available auctions
-- Place bids on products
-- Track bidding history
-- Search for specific products
-- Live highest-bid updates on auction detail page (API polling)
+## Feature Overview
 
-### Concurrency and Consistency
-- Strong consistency for bid placement using database row-level locking (`PESSIMISTIC_WRITE` on product row)
-- Atomic bid transaction: previous winning bid status update + new bid insert + product highest update in one transaction
-- Rollback-safe behavior to prevent partial state updates
-- Optimistic versioning on products using `@Version`
-- Fast highest-bid and timeline queries via database indexes
+| Role   | What You Can Do                                                                         |
+| ------ | --------------------------------------------------------------------------------------- |
+| Admin  | Approve or reject products, manage users, monitor system activity, manage auction slots |
+| Seller | Add products, configure price and schedule, track product state and bidding activity    |
+| Buyer  | Browse active auctions, inspect details, place bids, view bid history, search products  |
 
-## Technology Stack
+## Architecture
 
-- **Backend**: Spring Boot 1.1.8
-- **Database**: MySQL 8.0
-- **ORM**: Spring Data JPA
-- **Frontend**: Thymeleaf + Bootstrap 5
-- **Build Tool**: Maven
-
-## Prerequisites
-
-1. **Java 8** or later
-2. **MySQL 8.0** or later
-3. **Maven 3.6** or later
-
-## Setup Instructions
-
-### 1. Database Setup
-
-1. Install MySQL and start the service
-2. Create a database (the application will create it automatically):
-   ```sql
-   CREATE DATABASE auction_system;
-   ```
-3. Update database credentials in `src/main/resources/application.yml`:
-   ```yaml
-   spring:
-     datasource:
-       url: jdbc:mysql://localhost:3306/auction_system?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-       username: root
-       password: your_password
-   ```
-
-### 2. Application Setup
-
-1. Clone or download the project
-2. Navigate to the project directory:
-   ```bash
-   cd auction-system
-   ```
-3. Build and run the application:
-   ```bash
-   mvn clean spring-boot:run
-   ```
-
-### 3. Access the Application
-
-Once the application is running, open your browser and go to:
-```
-http://localhost:8080
+```mermaid
+flowchart LR
+      U[Users] --> W[Spring MVC Controllers]
+      W --> S[Service Layer]
+      S --> R[Spring Data JPA Repositories]
+      R --> D[(MySQL or PostgreSQL)]
+      SCH[AuctionScheduler] --> S
+      W --> V[Thymeleaf Views]
 ```
 
-## Security Features
+## Tech Stack
 
-### Password Security
-- **BCrypt Hashing**: All passwords are encrypted using BCrypt with salt
-- **Automatic Migration**: Existing plain text passwords are automatically migrated to hashed format on startup
-- **Password Change**: Users can securely change their passwords through the profile page
-- **Validation**: Password strength requirements (minimum 6 characters)
+| Layer     | Technology                                 |
+| --------- | ------------------------------------------ |
+| Runtime   | Java 11                                    |
+| Framework | Spring Boot 1.1.8.RELEASE                  |
+| Web       | Spring MVC + Thymeleaf                     |
+| Data      | Spring Data JPA + Hibernate                |
+| Databases | MySQL (default), PostgreSQL (prod profile) |
+| Security  | Session auth + BCrypt password encoding    |
+| Build     | Maven                                      |
+| Container | Docker multi-stage build                   |
 
-### Authentication
-- Session-based authentication
-- Role-based access control (Admin, Seller, Buyer)
-- Secure password validation
+## Local Setup
 
-## Default User Accounts
+### Prerequisites
 
-The application creates the following default accounts:
+1. Java 11+
+2. Maven 3.6+
+3. MySQL 8+ (or PostgreSQL if using profile override)
 
-### Admin Account
-- **Username**: `admin`
-- **Password**: `admin123`
-- **Email**: `admin@auction.com`
+### Run with MySQL (default)
 
-### Sample Seller Account
-- **Username**: `seller1`
-- **Password**: `seller123`
-- **Email**: `seller1@auction.com`
+1. Create database:
 
-### Sample Buyer Account
-- **Username**: `buyer1`
-- **Password**: `buyer123`
-- **Email**: `buyer1@auction.com`
+```sql
+CREATE DATABASE Auction_System;
+```
 
-**Note**: All passwords are securely hashed using BCrypt encryption.
-
-## User Workflows
-
-### For Sellers
-1. Login with seller credentials
-2. Go to "Add Product" to list items for auction
-3. Set product details, starting price, and auction schedule
-4. Wait for admin approval
-5. Monitor bids once approved
-
-### For Buyers
-1. Login with buyer credentials
-2. Browse "Active Auctions"
-3. View auction details and place bids
-4. Track your bids in "My Bids"
-
-### For Admins
-1. Login with admin credentials
-2. Review pending products for approval
-3. Manage users and system settings
-4. Monitor auction activities
-
-## Database Schema
-
-The application creates the following main tables:
-
-- `users` - Store user information
-- `products` - Store auction products
-- `bids` - Store bid information
-
-## API Endpoints
-
-### Authentication
-- `GET /login` - Login page
-- `POST /login` - Process login
-- `GET /register` - Registration page
-- `POST /register` - Process registration
-- `GET /logout` - Logout
-
-### Admin Routes
-- `GET /admin/dashboard` - Admin dashboard
-- `GET /admin/products` - Manage products
-- `POST /admin/product/approve/{id}` - Approve product
-- `POST /admin/product/reject/{id}` - Reject product
-
-### Seller Routes
-- `GET /seller/dashboard` - Seller dashboard
-- `GET /seller/products` - View seller's products
-- `GET /seller/product/add` - Add product form
-- `POST /seller/product/add` - Process add product
-
-### Buyer Routes
-- `GET /buyer/dashboard` - Buyer dashboard
-- `GET /buyer/auctions` - Browse auctions
-- `GET /buyer/auction/{id}` - View auction details
-- `POST /buyer/auction/{id}/bid` - Place bid
-
-### Concurrent Bidding APIs
-- `POST /api/auctions/{id}/bids` - Place bid (JSON body: `bidAmount`, optional `bidderId` for load tests)
-- `GET /api/auctions/{id}/highest-bid` - Current highest bid snapshot
-
-## Consistency Model
-
-This project now uses strong consistency for each auction's bid path.
-
-- Every bid transaction locks the target product row before checking and updating the highest bid.
-- Concurrent stale bids are rejected with `409` rather than overwriting newer winning bids.
-- `currentHighestBid`, winning bid status, and bid history are updated atomically.
-
-Eventual consistency can still be used for non-critical, read-heavy projections (analytics dashboards, recommendation feeds), but winner selection and highest-bid updates must remain strongly consistent.
-
-## Scalability Notes
-
-- Partition workload by auction ID (natural sharding key).
-- Keep bid writes directed to a primary DB node per shard for ordering guarantees.
-- Use read replicas for browse/search pages while bid write path remains strongly consistent.
-- Apply backpressure/rate limits when bid spikes exceed DB lock throughput.
-
-## Load Testing (50-100 Concurrent Bidders)
-
-Use the k6 script in [load-tests/concurrent-bidders.js](load-tests/concurrent-bidders.js).
+2. Update datasource values in src/main/resources/application.yml as needed.
+3. Start the app:
 
 ```bash
-k6 run \
-   -e BASE_URL=http://localhost:9090 \
-   -e AUCTION_ID=1 \
-   -e START_BIDDER_ID=3 \
-   -e BIDDER_COUNT=100 \
-   -e VUS=75 \
-   -e DURATION=45s \
-   load-tests/concurrent-bidders.js
+mvn clean spring-boot:run
 ```
 
-Expected: responses are primarily `201` and `409`, with no `5xx` errors.
+4. Open:
 
-## Configuration
+```text
+http://localhost:9090
+```
 
-### Application Properties
-The main configuration is in `src/main/resources/application.yml`:
+## Deployment on Render
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/auction_system?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: password
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+This repository already contains:
+
+- render.yaml
+- Dockerfile
+- Procfile
+- build.sh and start.sh
+
+### Recommended env vars
+
+| Variable               | Purpose                         |
+| ---------------------- | ------------------------------- |
+| SPRING_PROFILES_ACTIVE | Set to prod                     |
+| DATABASE_URL           | Managed DB connection string    |
+| DB_USERNAME            | DB username                     |
+| DB_PASSWORD            | DB password                     |
+| PORT                   | Runtime port injected by Render |
+
+## Default Accounts
+
+| Role   | Username | Password  |
+| ------ | -------- | --------- |
+| Admin  | admin    | admin123  |
+| Seller | seller1  | seller123 |
+| Buyer  | buyer1   | buyer123  |
+
+Change these credentials immediately for any shared or public deployment.
+
+## Routes at a Glance
+
+| Area   | Routes                                                                                           |
+| ------ | ------------------------------------------------------------------------------------------------ |
+| Auth   | GET /login, POST /login, GET /register, POST /register, GET /logout                              |
+| Admin  | GET /admin/dashboard, GET /admin/products, GET /admin/users, GET /admin/slots                    |
+| Seller | GET /seller/dashboard, GET /seller/products, GET and POST /seller/product/add                    |
+| Buyer  | GET /buyer/dashboard, GET /buyer/auctions, GET /buyer/auction/{id}, POST /buyer/auction/{id}/bid |
+
+## Project Structure
+
+```text
+Auction-System-main/
+   src/main/java/com/in/
+      controller/
+      service/
+      repository/
+      entity/
+      scheduled/
+   src/main/resources/
+      templates/
+      application.yml
+      application-prod.yml
+      application-postgres.yml
+   Dockerfile
+   render.yaml
+   pom.xml
 ```
 
 ## Troubleshooting
 
-### Common Issues
+### Database connection issues
 
-1. **Database Connection Error**
-   - Ensure MySQL is running
-   - Verify database credentials in `application.yml`
-   - Check if the database exists
+- Ensure database is reachable and credentials are correct.
+- Verify selected profile matches DB driver and dialect.
 
-2. **Port Already in Use**
-   - The application runs on port 8080 by default
-   - Change the port in `application.yml`:
-     ```yaml
-     server:
-       port: 8081
-     ```
+### Old UI still visible
 
-3. **Build Errors**
-   - Ensure Java 8+ is installed
-   - Check Maven configuration
-   - Run `mvn clean install` first
+- Rebuild app so templates are recopied to target/classes.
+- Restart service and do a hard refresh in browser.
 
-## Future Enhancements
+### Port conflict
 
-- Email notifications for auction events
-- Real-time bidding updates
-- Payment integration
-- Advanced search and filtering
-- Mobile responsive design improvements
-- REST API for mobile applications
+- Default local port is 9090.
+- Override via server.port or PORT.
+
+## Roadmap
+
+- Live bid updates
+- Notification pipeline
+- Better auction analytics
+- Optional REST-first API mode
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1. Create a feature branch.
+2. Keep commits small and focused.
+3. Run build before opening PR.
+4. Open a pull request with test notes and screenshots.
 
 ## License
 

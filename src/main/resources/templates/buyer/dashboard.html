@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Buyer Dashboard | Auction System</title>
+    <title>Buyer Dashboard | The Digital Curator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -13,16 +13,16 @@
             theme: {
                 extend: {
                     colors: {
-                        background: "#f9f9fd",
-                        primary: "#001736",
-                        secondary: "#006d43",
-                        outline: "#747780",
-                        "surface-container-low": "#f3f3f7",
-                        "surface-container": "#edeef1",
-                        "surface-container-high": "#e7e8eb",
-                        "surface-container-highest": "#e2e2e6",
-                        "secondary-container": "#75f8b3",
-                        "on-secondary-container": "#007147",
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary-container": "#fe9d00",
+                        "on-secondary-container": "#653c00",
                         error: "#ba1a1a"
                     },
                     fontFamily: {
@@ -38,14 +38,14 @@
             background:
                 radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
                 radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
-                #f9f9fd;
+                #f8f9ff;
         }
 
         .pulse-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background-color: #006d43;
+            background-color: #885200;
             box-shadow: 0 0 0 rgba(0, 109, 67, 0.4);
             animation: pulse 2s infinite;
         }
@@ -73,7 +73,7 @@
 <body class="font-body text-slate-900 overflow-x-hidden">
 <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
     <div class="flex items-center gap-8">
-        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">Auction System</span>
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
         <nav class="hidden md:flex gap-6 items-center">
             <a class="font-headline tracking-tight text-blue-900 border-b-2 border-blue-900 pb-1" href="/buyer/dashboard">Dashboard</a>
             <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700 transition-colors" href="/buyer/auctions">Auctions</a>
@@ -202,7 +202,7 @@
                             </div>
                             <div class="flex flex-col justify-center">
                                 <span class="text-[10px] text-outline uppercase mb-1">Current Bid</span>
-                                <span class="font-headline text-2xl font-bold text-primary" th:text="'₹' + ${auction.currentHighestBid}">₹0</span>
+                                <span class="font-headline text-2xl font-bold text-primary" th:text="'â‚¹' + ${auction.currentHighestBid}">â‚¹0</span>
                             </div>
                             <div class="flex flex-col justify-center">
                                 <span class="text-[10px] text-outline uppercase mb-1">Ends</span>
@@ -250,7 +250,7 @@
                         <div class="flex gap-3" th:each="bid : ${userBids}">
                             <div class="w-2 h-2 mt-1.5 rounded-full bg-secondary"></div>
                             <div>
-                                <p class="text-xs font-medium text-primary" th:text="'Bid: ₹' + ${bid.bidAmount} + ' on ' + ${bid.product.title}">Bid event</p>
+                                <p class="text-xs font-medium text-primary" th:text="'Bid: â‚¹' + ${bid.bidAmount} + ' on ' + ${bid.product.title}">Bid event</p>
                                 <p class="text-[10px] text-outline" th:text="${bid.bidTime}">Time</p>
                             </div>
                         </div>
@@ -285,3 +285,5 @@
 </nav>
 </body>
 </html>
+
+

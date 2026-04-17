@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Search | Auction System</title>
+    <title>Search | The Digital Curator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -13,13 +13,13 @@
             theme: {
                 extend: {
                     colors: {
-                        background: "#f9f9fd",
-                        primary: "#001736",
-                        secondary: "#006d43",
-                        outline: "#747780",
-                        "surface-container-low": "#f3f3f7",
-                        "surface-container": "#edeef1",
-                        "surface-container-high": "#e7e8eb"
+                        background: "#f8f9ff",
+                        primary: "#000104",
+                        secondary: "#885200",
+                        outline: "#75777d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff"
                     },
                     fontFamily: {
                         headline: ["Space Grotesk", "sans-serif"],
@@ -34,7 +34,7 @@
             background:
                 radial-gradient(circle at 8% -12%, #dbeafe 0%, #dbeafe00 38%),
                 radial-gradient(circle at 92% -10%, #dcfce7 0%, #dcfce700 34%),
-                #f9f9fd;
+                #f8f9ff;
         }
 
         @keyframes pageIn {
@@ -50,7 +50,7 @@
 <body class="font-body text-slate-900 overflow-x-hidden">
 <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm flex justify-between items-center px-6 h-16">
     <div class="flex items-center gap-8">
-        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">Auction System</span>
+        <span class="text-2xl font-bold tracking-tighter text-blue-900 font-headline">The Digital Curator</span>
         <nav class="hidden md:flex gap-6 items-center">
             <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/dashboard">Dashboard</a>
             <a class="font-headline tracking-tight text-slate-500 hover:text-blue-700" href="/buyer/auctions">Auctions</a>
@@ -131,11 +131,11 @@
                     <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
                         <div class="bg-surface-container-low rounded-lg px-3 py-2">
                             <p class="text-[11px] uppercase tracking-wider text-outline">Starting</p>
-                            <p class="font-semibold text-primary" th:text="'₹' + ${product.startingPrice}">₹0</p>
+                            <p class="font-semibold text-primary" th:text="'â‚¹' + ${product.startingPrice}">â‚¹0</p>
                         </div>
                         <div class="bg-surface-container-low rounded-lg px-3 py-2">
                             <p class="text-[11px] uppercase tracking-wider text-outline">Current</p>
-                            <p class="font-semibold text-secondary" th:text="'₹' + ${product.currentHighestBid}">₹0</p>
+                            <p class="font-semibold text-secondary" th:text="'â‚¹' + ${product.currentHighestBid}">â‚¹0</p>
                         </div>
                     </div>
                     <p class="text-xs text-outline mt-3" th:text="'Ends: ' + ${product.auctionEndTime}">Ends: --</p>
@@ -150,3 +150,5 @@
 </main>
 </body>
 </html>
+
+
