@@ -3,6 +3,13 @@ spring:
   thymeleaf.cache: true
   main.banner-mode: off
   
+  # Flyway Migration Configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+
   # Production Database Configuration (Environment variables)
   datasource:
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/Auction_System?createDatabaseIfNotExist=true&useSSL=true&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true}
